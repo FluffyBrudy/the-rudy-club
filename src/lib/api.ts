@@ -1,10 +1,15 @@
-import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
-import { ACCESS_TOKEN } from "./constants";
-import { LoginResponse } from "@/types/apiResponseTypes";
+import axios, {
+  type AxiosInstance,
+  type AxiosError,
+  type AxiosResponse,
+} from "axios";
+import type {
+  LoginResponse,
+  PostResponse,
+  RegisterResponse,
+} from "@/types/apiResponseTypes";
 
-type TLoginResponse =
-  | { error: null; data: LoginResponse }
-  | { error: string; data: null };
+type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
 type ErrorResponse = {
   status: number;
   statusText: string;
@@ -15,13 +20,15 @@ class ApiClient {
   private axiosInstance: AxiosInstance;
 
   private endpoints = {
-    AUTH_LOGIN: "/auth/login",
-    AUTH_REGISTER: "/auth/register",
+    AUTH_LOGIN: "/api/auth/login",
+    AUTH_REGISTER: "/api/auth/register",
+    AUTH_AUTOLOGIN: "/api/auth/authorize",
+    POST_FETCH: "/api/post/fetch",
   };
 
-  constructor(baseURL: string) {
+  constructor() {
     this.axiosInstance = axios.create({
-      baseURL,
+      baseURL: "",
       withCredentials: true,
     });
 
@@ -31,7 +38,7 @@ class ApiClient {
 
   private _initializeRequestInterceptor() {
     this.axiosInstance.interceptors.request.use((config) => {
-      const token = localStorage.getItem(ACCESS_TOKEN);
+      const token = localStorage.getItem("accessToken");
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -45,6 +52,7 @@ class ApiClient {
       (error: AxiosError) => {
         const response = error.response;
         if (response) {
+          console.log(response);
           const { data, status, statusText } = response;
           return Promise.reject({ data, status, statusText });
         } else {
@@ -59,20 +67,20 @@ class ApiClient {
   }
 
   public async loginUser(
-    username: string,
+    email: string,
     password: string
-  ): Promise<TLoginResponse> {
+  ): Promise<TAPIResponse<LoginResponse>> {
     try {
       const userLogin = await this.axiosInstance.post(
         this.endpoints.AUTH_LOGIN,
         {
-          username,
+          email,
           password,
         }
       );
       if ([200, 201].includes(userLogin.status)) {
-        const data = userLogin.data as LoginResponse;
-        return { error: null, data: data };
+        const data = userLogin.data as { data: LoginResponse };
+        return { error: null, data: data.data };
       } else {
         return { error: "failed to login", data: null };
       }
@@ -82,8 +90,67 @@ class ApiClient {
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }
+
+  public async autoLoginUser(): Promise<
+    TAPIResponse<Omit<LoginResponse, "accessToken">>
+  > {
+    try {
+      const autoLogin = await this.axiosInstance.get(
+        this.endpoints.AUTH_AUTOLOGIN
+      );
+      if (autoLogin.status === 200) {
+        const data = autoLogin.data as {
+          data: Omit<LoginResponse, "accessToken">;
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to login", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to login";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async registerUser(
+    username: string,
+    email: string,
+    password: string
+  ): Promise<TAPIResponse<RegisterResponse>> {
+    try {
+      const userLogin = await this.axiosInstance.post(
+        this.endpoints.AUTH_REGISTER,
+        {
+          username,
+          email,
+          password,
+        }
+      );
+      if ([200, 201].includes(userLogin.status)) {
+        const data = userLogin.data as { data: RegisterResponse };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to register", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to register";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async fetchPosts() {
+    const response = await this.axiosInstance.get(this.endpoints.POST_FETCH);
+    if (response.status === 200) {
+      const data = response.data as { data: PostResponse[] };
+      return { error: null, data: data.data };
+    } else {
+      return { error: "failed to fetch post", data: null };
+    }
+  }
 }
 
-const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL!);
+const apiClient = new ApiClient();
 
 export default apiClient;

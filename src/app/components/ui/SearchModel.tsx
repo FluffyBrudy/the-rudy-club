@@ -25,7 +25,7 @@ const recentSearches = [
 ];
 
 const trendingSearches = [
-  "AI integration",
+  "Social Media",
   "Dark mode",
   "Authentication",
   "Database setup",
@@ -147,7 +147,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
           <div className="max-h-96 overflow-y-auto">
             {!showResults ? (
-              /* Default State - Recent & Trending */
               <div className="p-6 space-y-6">
                 <div>
                   <div className="flex items-center mb-3">
@@ -191,7 +190,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 </div>
               </div>
             ) : (
-              /* Search Results */
               <div className="p-6">
                 <div className="mb-4">
                   <p className="text-sm text-muted-foreground">
@@ -230,7 +228,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Press ESC to close</span>
               <div className="flex items-center space-x-4">
-                <span>↑↓ to navigate</span>
                 <span>↵ to select</span>
               </div>
             </div>

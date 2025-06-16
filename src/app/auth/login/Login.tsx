@@ -1,20 +1,22 @@
 "use client";
 
+import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import { LOGIN_ROUTE } from "@/lib/constants";
+import { REGISTER_ROUTE, FEEDS_ROUTE } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { LogIn } from "lucide-react";
 import FormInput from "@/app/components/ui/FormComponents/FormInput";
 import FormButton from "@/app/components/ui/FormComponents/FormButton";
 import FormAlert from "@/app/components/ui/FormComponents/FormAlert";
 
-export default function Register() {
+export default function Login() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const performLogin = useAppStore((state) => state.login);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,24 +25,23 @@ export default function Register() {
 
     const formData = new FormData(event.currentTarget);
     const username = formData.get("username") as string;
-    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
     try {
-      const registerResponse = await apiClient.registerUser(
-        username,
-        email,
-        password
-      );
-      if (!registerResponse.error) {
+      const loginResponse = await apiClient.loginUser(username, password);
+      if (loginResponse.data) {
+        const { accessToken, ...other } = loginResponse.data;
+        console.log(other);
+        performLogin(other);
+        localStorage.setItem("accessToken", accessToken);
         setSuccess(true);
         setError(null);
 
         setTimeout(() => {
-          router.push(LOGIN_ROUTE);
-        }, 2000);
+          router.push(FEEDS_ROUTE);
+        }, 1000);
       } else {
-        setError(registerResponse.error);
+        setError(loginResponse.error);
         setSuccess(false);
       }
     } catch (err) {
@@ -59,16 +60,16 @@ export default function Register() {
             className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
             style={{ backgroundColor: "var(--primary-color)" }}
           >
-            <UserPlus className="w-8 h-8 text-white" />
+            <LogIn className="w-8 h-8 text-white" />
           </div>
           <h1
             className="text-3xl font-bold mb-2"
             style={{ color: "var(--text-color)" }}
           >
-            Join RudyClub
+            Welcome Back
           </h1>
           <p style={{ color: "var(--secondary-color)" }}>
-            Create your account to get started
+            Sign in to your account to continue
           </p>
         </div>
 
@@ -85,15 +86,7 @@ export default function Register() {
               name="username"
               type="text"
               required
-              placeholder="Choose a username"
-            />
-
-            <FormInput
-              label="Email Address"
-              name="email"
-              type="email"
-              required
-              placeholder="Enter your email"
+              placeholder="Enter your username"
             />
 
             <FormInput
@@ -101,14 +94,14 @@ export default function Register() {
               name="password"
               type="password"
               required
-              placeholder="Create a strong password"
+              placeholder="Enter your password"
             />
 
             {error && <FormAlert type="error" message={error} />}
             {success && (
               <FormAlert
                 type="success"
-                message="Registration successful! Redirecting to login..."
+                message="Login successful! Redirecting..."
               />
             )}
 
@@ -117,11 +110,10 @@ export default function Register() {
               loading={loading}
               disabled={loading || success}
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {loading ? "Signing in..." : "Sign In"}
             </FormButton>
           </form>
 
-          {/* Divider */}
           <div className="my-6 flex items-center">
             <div
               className="flex-1 h-px"
@@ -139,26 +131,24 @@ export default function Register() {
             ></div>
           </div>
 
-          {/* Login Link */}
           <div className="text-center">
             <p className="text-sm" style={{ color: "var(--secondary-color)" }}>
-              Already have an account?{" "}
+              {"Don't"} have an account?{" "}
               <Link
-                href={LOGIN_ROUTE}
+                href={REGISTER_ROUTE}
                 className="font-medium hover:underline transition-colors duration-200"
                 style={{ color: "var(--primary-color)" }}
               >
-                Sign in here
+                Create one here
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-xs" style={{ color: "var(--muted-color)" }}>
-            By creating an account, you agree to our Terms of Service and
-            Privacy Policy(🤡)
+            By signing in, you agree to our Terms of Service and Privacy
+            Policy(🤡)
           </p>
         </div>
       </div>
