@@ -127,8 +127,8 @@ export default function PostCard({ post }: PostCardProps) {
                         src={media || "/placeholder.svg"}
                         alt={`Media content ${index + 1}`}
                         className="object-cover"
-                        width={48}
-                        height={48}
+                        fill
+                        style={{ objectFit: "contain" }}
                       />
                     </div>
                   ))}

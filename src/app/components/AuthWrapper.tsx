@@ -2,21 +2,26 @@
 
 import type React from "react";
 import { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import { LOGIN_ROUTE } from "@/lib/constants";
+import {
+  FEEDS_ROUTE,
+  LOGIN_ROUTE,
+  REGISTER_ROUTE,
+  ROOT_ROUTE,
+} from "@/lib/constants";
 
 export default function AuthWrapper({ children }: { children: ReactNode }) {
   const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
   const performLogin = useAppStore((state) => state.login);
 
   useEffect(() => {
     const performCheck = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        router.replace(LOGIN_ROUTE);
         return;
       }
 
@@ -24,7 +29,11 @@ export default function AuthWrapper({ children }: { children: ReactNode }) {
         const response = await apiClient.autoLoginUser();
         if (response.data) {
           performLogin(response.data);
+          console.log(response.data);
           setIsChecking(false);
+          if (pathname !== FEEDS_ROUTE) {
+            router.push(FEEDS_ROUTE);
+          }
         } else {
           console.error("No user data in response", response.data);
           router.replace(LOGIN_ROUTE);
@@ -34,9 +43,11 @@ export default function AuthWrapper({ children }: { children: ReactNode }) {
         router.replace(LOGIN_ROUTE);
       }
     };
+    if (![LOGIN_ROUTE, REGISTER_ROUTE].includes(pathname)) performCheck();
+  }, [router, performLogin, pathname]);
 
-    performCheck();
-  }, [router, performLogin]);
+  if ([LOGIN_ROUTE, REGISTER_ROUTE, ROOT_ROUTE].includes(pathname))
+    return <>{children}</>;
 
   if (isChecking) {
     return (

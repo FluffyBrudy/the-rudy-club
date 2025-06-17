@@ -2,7 +2,6 @@ import Feeds from "./Feeds";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LOGIN_ROUTE } from "@/lib/constants";
-import AuthWrapper from "../components/AuthWrapper";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -13,9 +12,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AuthWrapper>
-        <Feeds />
-      </AuthWrapper>
+      <Feeds />
     </main>
   );
 }

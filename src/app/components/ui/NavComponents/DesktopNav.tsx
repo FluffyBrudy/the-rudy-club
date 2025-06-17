@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "@/lib/nav";
 import { useAppStore } from "@/app/store/appStore";
+import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/constants";
 
 export default function DesktopNav() {
   const pathname = usePathname();
@@ -18,10 +19,11 @@ export default function DesktopNav() {
     <div className="hidden md:flex items-center space-x-1">
       {filteredLinks.map((link) => {
         const isActive = pathname === link.href;
+        const href = user && link.href === ROOT_ROUTE ? FEEDS_ROUTE : link.href;
         return (
           <Link
             key={link.name}
-            href={link.href}
+            href={href}
             className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${
               isActive
                 ? "text-lime-600 dark:text-lime-600"

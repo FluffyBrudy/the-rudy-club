@@ -8,11 +8,14 @@ import DesktopNav from "@/app/components/ui/NavComponents/DesktopNav";
 import NavIcons from "@/app/components/ui/NavComponents/NavIcons";
 import MobileMenu from "@/app/components/ui/NavComponents/MobileMenu";
 import ToggleMenuIcon from "@/app/components/ui/NavComponents/MobileMenuIcon";
+import ThemeSwitcher from "./ThemeSwitcher";
+import { useAppStore } from "@/app/store/appStore";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const user = useAppStore((state) => state.user);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -61,7 +64,8 @@ export default function Navbar() {
             <DesktopNav />
 
             <div className="hidden md:flex items-center space-x-3">
-              <NavIcons onSearch={openSearch} />
+              {user && <NavIcons onSearch={openSearch} />}
+              <ThemeSwitcher />
             </div>
 
             <div className="flex items-center space-x-2 md:hidden">
@@ -83,7 +87,8 @@ export default function Navbar() {
                   />
                 </svg>
               </button>
-              <NavIcons onSearch={() => {}} />
+              {user && <NavIcons onSearch={() => {}} />}
+              <ThemeSwitcher />
               <button
                 onClick={toggleMenu}
                 className="p-2 rounded-xl hover:bg-accent/50 transition-all duration-200 active:scale-95"

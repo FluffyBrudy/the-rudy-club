@@ -22,8 +22,18 @@ class ApiClient {
   private endpoints = {
     AUTH_LOGIN: "/api/auth/login",
     AUTH_REGISTER: "/api/auth/register",
-    AUTH_AUTOLOGIN: "/api/auth/authorize",
+    AUTH_AUTHORIZE: "/api/auth/authorize",
+
+    POST_CREATE: "/api/post/create",
     POST_FETCH: "/api/post/fetch",
+
+    COMMENT_CREATE: "/api/comment/create",
+    COMMENT_FETCH: "/api/comment/fetch",
+    COMMENT_REPLY_CREATE: "/api/comment/reply/create",
+    COMMENT_REPLY_FETCH: "/api/comment/reply/fetch",
+
+    REACTION_CREATE: "/api/reaction/create",
+    REACTION_FETCH: "/api/reaction/fetch",
   };
 
   constructor() {
@@ -96,7 +106,7 @@ class ApiClient {
   > {
     try {
       const autoLogin = await this.axiosInstance.get(
-        this.endpoints.AUTH_AUTOLOGIN
+        this.endpoints.AUTH_AUTHORIZE
       );
       if (autoLogin.status === 200) {
         const data = autoLogin.data as {
