@@ -7,6 +7,8 @@ import type {
   LoginResponse,
   PostResponse,
   RegisterResponse,
+  CommentResponse,
+  CommentReplyResponse,
 } from "@/types/apiResponseTypes";
 
 type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
@@ -81,6 +83,8 @@ class ApiClient {
     password: string
   ): Promise<TAPIResponse<LoginResponse>> {
     try {
+      console.log("Making login request to:", this.endpoints.AUTH_LOGIN);
+
       const userLogin = await this.axiosInstance.post(
         this.endpoints.AUTH_LOGIN,
         {
@@ -88,6 +92,10 @@ class ApiClient {
           password,
         }
       );
+
+      console.log("Login API response status:", userLogin.status);
+      console.log("Login API response data:", userLogin.data);
+
       if ([200, 201].includes(userLogin.status)) {
         const data = userLogin.data as { data: LoginResponse };
         return { error: null, data: data.data };
@@ -95,8 +103,9 @@ class ApiClient {
         return { error: "failed to login", data: null };
       }
     } catch (error) {
+      console.error("Login API error:", error);
       const e = error as ErrorResponse;
-      const errMsg = e.data.error || e.statusText || "failed to login";
+      const errMsg = e.data?.error || e.statusText || "failed to login";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }
@@ -157,6 +166,122 @@ class ApiClient {
       return { error: null, data: data.data };
     } else {
       return { error: "failed to fetch post", data: null };
+    }
+  }
+
+  public async createPost(contents: {
+    textContent?: string;
+    mediaContent?: string[];
+  }): Promise<TAPIResponse<PostResponse>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.POST_CREATE,
+        { contents }
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as { data: PostResponse };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create post", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to create post";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async fetchComments(
+    postId: number
+  ): Promise<TAPIResponse<CommentResponse[]>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.COMMENT_FETCH,
+        { postId: postId.toString() }
+      );
+      if (response.status === 200) {
+        const data = response.data as { data: CommentResponse[] };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to fetch comments", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to fetch comments";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async createComment(
+    postId: number,
+    commentBody: string
+  ): Promise<TAPIResponse<CommentResponse>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.COMMENT_CREATE,
+        {
+          postId: postId.toString(),
+          commentBody,
+        }
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as { data: CommentResponse };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create comment", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to create comment";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async fetchReplies(
+    parentCommentId: number
+  ): Promise<TAPIResponse<CommentReplyResponse[]>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.COMMENT_REPLY_FETCH,
+        {
+          parentCommentId: parentCommentId.toString(),
+        }
+      );
+      if (response.status === 200) {
+        const data = response.data as { data: CommentReplyResponse[] };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to fetch replies", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to fetch replies";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async createReply(
+    parentCommentId: number,
+    replyContent: string
+  ): Promise<TAPIResponse<CommentReplyResponse>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.COMMENT_REPLY_CREATE,
+        {
+          parentCommentId: parentCommentId,
+          replyContent,
+        }
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as { data: CommentReplyResponse };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reply", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data.error || e.statusText || "failed to create reply";
+      return { error: `${e.status}:${errMsg}`, data: null };
     }
   }
 }

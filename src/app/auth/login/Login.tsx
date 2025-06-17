@@ -24,30 +24,37 @@ export default function Login() {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    console.log("Login attempt with:", { email, password: "***" });
+
     try {
-      const loginResponse = await apiClient.loginUser(username, password);
+      const loginResponse = await apiClient.loginUser(email, password);
+      console.log("Login response:", loginResponse);
+
       if (loginResponse.data) {
         const { accessToken, ...other } = loginResponse.data;
-        console.log(other);
+        console.log("Login successful, storing token and user data");
+
         performLogin(other);
         localStorage.setItem("accessToken", accessToken);
         setSuccess(true);
         setError(null);
-
         setTimeout(() => {
           router.push(FEEDS_ROUTE);
         }, 1000);
       } else {
+        console.log("Login failed:", loginResponse.error);
         setError(loginResponse.error);
         setSuccess(false);
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError((err as Error).message ?? "An unexpected error occurred");
       setSuccess(false);
     } finally {
+      console.log("Setting loading to false");
       setLoading(false);
     }
   }
@@ -82,11 +89,11 @@ export default function Login() {
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormInput
-              label="Username"
-              name="username"
-              type="text"
+              label="Email"
+              name="email"
+              type="email"
               required
-              placeholder="Enter your username"
+              placeholder="Enter your email"
             />
 
             <FormInput

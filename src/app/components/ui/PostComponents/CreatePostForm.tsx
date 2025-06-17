@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import { ImageIcon, Smile, MapPin, X, Loader2 } from "lucide-react";
 import { useAppStore } from "@/app/store/appStore";
 import Image from "next/image";
+import apiClient from "@/lib/api";
 
 export default function CreatePostForm() {
   const [content, setContent] = useState("");
@@ -23,28 +24,23 @@ export default function CreatePostForm() {
     setIsSubmitting(true);
 
     try {
-      setTimeout(() => {
-        const newPost = {
-          authorId: user?.userId || "unknown",
-          postId: Math.floor(Math.random() * 10000),
-          content: {
-            textContent: content,
-            mediaContent: previewImages.length > 0 ? previewImages : undefined,
-          },
-          createdAt: new Date(),
-          username: user?.username || "Anonymous",
-          profilePicture: user?.profilePicture || "",
-          totalReaction: 0,
-          reactions: [],
-        };
+      const postData = {
+        textContent: content.trim() || undefined,
+        mediaContent: previewImages.length > 0 ? previewImages : undefined,
+      };
 
-        addPost(newPost);
+      const response = await apiClient.createPost(postData);
+
+      if (response.data) {
+        addPost(response.data);
         setContent("");
         setPreviewImages([]);
-        setIsSubmitting(false);
-      }, 1000);
+      } else {
+        console.error("Failed to create post:", response.error);
+      }
     } catch (error) {
       console.error("Error creating post:", error);
+    } finally {
       setIsSubmitting(false);
     }
   };

@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "./components/ui/Navbar";
-import AuthWrapper from "./components/AuthWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +37,7 @@ export default function RootLayout({
           enableSystem={false}
         >
           <Navbar />
-          <AuthWrapper>{children}</AuthWrapper>
+          {children}
         </ThemeProvider>
       </body>
     </html>

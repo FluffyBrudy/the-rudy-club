@@ -20,8 +20,8 @@ export type PostResponse = {
     textContent?: string;
     mediaContent?: string[];
   };
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
   username: string;
   profilePicture: string;
   totalReaction: number;
@@ -33,8 +33,8 @@ export type CommentResponse = {
   commentorId: string;
   commentBody: string;
   postId: number;
-  createdAt: Date;
-  updatedAt?: Date;
+  createdAt: string;
+  updatedAt?: string;
   username: string;
   profilePicture: string;
   totalReaction: number;
@@ -63,12 +63,12 @@ export type UndoReactionResponse = {
 
 export type CommentReplyResponse = {
   commentReplyId: number;
-  createdAt: Date;
+  createdAt: string;
   profilePicture: string;
   parentCommentId: number;
   repliedById: string;
   replyContent: string;
-  updatedAt?: Date;
+  updatedAt?: string;
   username: string;
   totalReaction: number;
   reactions: reactionDisplayInfo;
