@@ -1,35 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Heart,
-  MessageCircle,
-  Share2,
-  MoreHorizontal,
-  Repeat2,
-} from "lucide-react";
+import { MessageCircle, Share2, MoreHorizontal, Repeat2 } from "lucide-react";
 import type { PostResponse } from "@/types/apiResponseTypes";
 import Image from "next/image";
 import CommentSection from "./CommentSection";
+import ReactionPicker from "../ReactionComponents/ReactionPicker";
 
 interface PostCardProps {
   post: PostResponse;
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.totalReaction || 0);
   const [showOptions, setShowOptions] = useState(false);
   const [showComments, setShowComments] = useState(false);
-
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount((prev) => prev - 1);
-    } else {
-      setLikeCount((prev) => prev + 1);
-    }
-    setLiked(!liked);
-  };
 
   const formattedDate = post.createdAt!;
 
@@ -137,36 +121,31 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
 
             <div className="mt-4 flex items-center justify-between">
-              <button
-                onClick={handleLike}
-                className={`flex items-center gap-1 p-2 rounded-full transition-colors duration-200 ${
-                  liked ? "text-red-500" : ""
-                } hover:bg-accent/50`}
-              >
-                <Heart
-                  size={18}
-                  fill={liked ? "currentColor" : "none"}
-                  className={liked ? "text-red-500" : ""}
+              <div className="flex items-center gap-2">
+                <ReactionPicker
+                  reactionOnId={post.postId.toString()}
+                  reactionOnType="post"
+                  initialReactionCount={post.totalReaction}
+                  reactions={post.reactions}
                 />
-                <span className="text-sm">
-                  {likeCount > 0 ? likeCount : ""}
-                </span>
-              </button>
+              </div>
 
-              <button
-                onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
-              >
-                <MessageCircle size={18} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowComments(!showComments)}
+                  className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
+                >
+                  <MessageCircle size={18} />
+                </button>
 
-              <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
-                <Repeat2 size={18} />
-              </button>
+                <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                  <Repeat2 size={18} />
+                </button>
 
-              <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
-                <Share2 size={18} />
-              </button>
+                <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                  <Share2 size={18} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

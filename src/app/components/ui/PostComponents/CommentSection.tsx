@@ -17,6 +17,7 @@ import type {
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
 import Image from "next/image";
+import ReactionPicker from "../ReactionComponents/ReactionPicker";
 
 interface CommentSectionProps {
   postId: number;
@@ -262,8 +263,16 @@ export default function CommentSection({
                         <p className="text-sm">{comment.commentBody}</p>
                       </div>
 
-                      {/* Reply Button */}
-                      <div className="flex items-center gap-4 mt-2 ml-3">
+                      <div className="flex items-center justify-between mt-2 ml-3">
+                        <div className="flex items-center gap-2">
+                          <ReactionPicker
+                            reactionOnId={comment.commentId.toString()}
+                            reactionOnType="comment"
+                            initialReactionCount={comment.totalReaction}
+                            reactions={comment.reactions}
+                          />
+                        </div>
+
                         <button
                           onClick={() => toggleReplies(comment.commentId)}
                           className="text-xs font-medium hover:underline"
@@ -273,14 +282,6 @@ export default function CommentSection({
                             ? "Hide replies"
                             : "Reply"}
                         </button>
-                        {comment.totalReaction > 0 && (
-                          <span
-                            className="text-xs"
-                            style={{ color: "var(--muted-color)" }}
-                          >
-                            {comment.totalReaction} reactions
-                          </span>
-                        )}
                       </div>
 
                       {expandedReplies.has(comment.commentId) && (
@@ -413,6 +414,17 @@ export default function CommentSection({
                                       <p className="text-xs">
                                         {reply.replyContent}
                                       </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-1 mt-1">
+                                      <ReactionPicker
+                                        reactionOnId={reply.commentReplyId.toString()}
+                                        reactionOnType="reply"
+                                        initialReactionCount={
+                                          reply.totalReaction
+                                        }
+                                        reactions={reply.reactions}
+                                      />
                                     </div>
                                   </div>
                                 </div>

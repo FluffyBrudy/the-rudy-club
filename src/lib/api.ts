@@ -10,6 +10,10 @@ import type {
   CommentResponse,
   CommentReplyResponse,
 } from "@/types/apiResponseTypes";
+import {
+  ReactionResponse,
+  UndoReactionResponse,
+} from "@/types/apiResponseTypes";
 
 type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
 type ErrorResponse = {
@@ -35,7 +39,6 @@ class ApiClient {
     COMMENT_REPLY_FETCH: "/api/comment/reply/fetch",
 
     REACTION_CREATE: "/api/reaction/create",
-    REACTION_FETCH: "/api/reaction/fetch",
   };
 
   constructor() {
@@ -281,6 +284,36 @@ class ApiClient {
     } catch (error) {
       const e = error as ErrorResponse;
       const errMsg = e.data.error || e.statusText || "failed to create reply";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async createReaction(
+    reactionOnId: string,
+    reactionOnType: string,
+    reactionType: string
+  ): Promise<TAPIResponse<ReactionResponse | UndoReactionResponse>> {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.REACTION_CREATE,
+        {
+          reactionOnId,
+          reactionOnType,
+          reactionType,
+        }
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as {
+          data: ReactionResponse | UndoReactionResponse;
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reaction", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg =
+        e.data?.error || e.statusText || "failed to create reaction";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }
