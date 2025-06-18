@@ -36,8 +36,8 @@ export default function Login() {
       if (loginResponse.data) {
         const { accessToken, ...other } = loginResponse.data;
         console.log("Login successful, storing token and user data");
-
         performLogin(other);
+        console.log(other);
         localStorage.setItem("accessToken", accessToken);
         setSuccess(true);
         setError(null);

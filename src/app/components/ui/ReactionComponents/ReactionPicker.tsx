@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
 import {
   reactionDisplayInfo,
@@ -42,8 +43,15 @@ export default function ReactionPicker({
   reactionOnId,
   reactionOnType,
 }: ReactionPickerProps) {
+  const user = useAppStore((state) => state.user);
+  const userReactedIcon =
+    (reactions.find((val) => val.reactorTd === user?.userId)
+      ?.reactionType as unknown as ReactionType | null) ?? null;
+  console.log(userReactedIcon, user, reactions);
   const [displayReactions, setDisplayReactions] = useState(false);
-  const [userReaction, setUserReaction] = useState<ReactionType | null>(null);
+  const [userReaction, setUserReaction] = useState<ReactionType | null>(
+    userReactedIcon
+  );
   const [reactionCount, setReactionCount] = useState(initialReactionCount);
   const containerRef = useRef<HTMLDivElement>(null);
 
