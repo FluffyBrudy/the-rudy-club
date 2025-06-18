@@ -14,6 +14,7 @@ import {
   ReactionResponse,
   UndoReactionResponse,
 } from "@/types/apiResponseTypes";
+import { USER_STORE } from "./constants";
 
 type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
 type ErrorResponse = {
@@ -67,8 +68,10 @@ class ApiClient {
       (error: AxiosError) => {
         const response = error.response;
         if (response) {
-          console.log(response);
           const { data, status, statusText } = response;
+          if (data && (data as { error: string }).error === "jwt expired") {
+            sessionStorage.removeItem(USER_STORE);
+          }
           return Promise.reject({ data, status, statusText });
         } else {
           return Promise.reject({ data: { error: "connection error" } });
@@ -86,8 +89,6 @@ class ApiClient {
     password: string
   ): Promise<TAPIResponse<LoginResponse>> {
     try {
-      console.log("Making login request to:", this.endpoints.AUTH_LOGIN);
-
       const userLogin = await this.axiosInstance.post(
         this.endpoints.AUTH_LOGIN,
         {
@@ -95,9 +96,6 @@ class ApiClient {
           password,
         }
       );
-
-      console.log("Login API response status:", userLogin.status);
-      console.log("Login API response data:", userLogin.data);
 
       if ([200, 201].includes(userLogin.status)) {
         const data = userLogin.data as { data: LoginResponse };

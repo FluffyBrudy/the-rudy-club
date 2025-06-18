@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log(request.headers.get("accessToken"));
     const token = request.headers.get("Authorization");
     if (!token) throw new Error("no token provided");
     const response = await fetch(`${process.env.MAIN_API_URL}/auth/authorize`, {

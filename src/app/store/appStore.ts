@@ -1,16 +1,26 @@
 import { AppState } from "@/types/storeTypes";
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import { createAuthSlice } from "./slice/authSlice";
 import { createPostSlice } from "./slice/postSlice";
 import { createCommentSlice } from "./slice/commentSlice";
 import { createReplySlice } from "./slice/replySlice";
+import { USER_STORE } from "@/lib/constants";
 
 export const useAppStore = create<AppState>()(
-  devtools((...a) => ({
-    ...createAuthSlice(...a),
-    ...createPostSlice(...a),
-    ...createCommentSlice(...a),
-    ...createReplySlice(...a),
-  }))
+  devtools(
+    persist(
+      (...a) => ({
+        ...createAuthSlice(...a),
+        ...createPostSlice(...a),
+        ...createCommentSlice(...a),
+        ...createReplySlice(...a),
+      }),
+      {
+        name: USER_STORE,
+        storage: createJSONStorage(() => sessionStorage),
+        partialize: (state) => ({ user: state.user }),
+      }
+    )
+  )
 );

@@ -1,20 +1,26 @@
 "use client";
 
 import apiClient from "@/lib/api";
-import { LOGIN_ROUTE } from "@/lib/constants";
+import { FEEDS_ROUTE, LOGIN_ROUTE } from "@/lib/constants";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
 import FormInput from "@/app/components/ui/FormComponents/FormInput";
 import FormButton from "@/app/components/ui/FormComponents/FormButton";
 import FormAlert from "@/app/components/ui/FormComponents/FormAlert";
+import { useLogin } from "@/app/hooks/useAuth";
 
 export default function Register() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const { login } = useLogin(FEEDS_ROUTE);
+
+  useEffect(() => {
+    login();
+  }, [login]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

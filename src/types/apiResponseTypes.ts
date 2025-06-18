@@ -46,7 +46,7 @@ export type ReactionResponse = {
   reactionOnId: number;
   reactionOnType: string;
   reactionType: string;
-  reactorTd: string;
+  reactorId: string;
   username: string;
 };
 

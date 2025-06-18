@@ -4,11 +4,10 @@ import { Search, TrendingUp, Users, Calendar } from "lucide-react";
 import Image from "next/image";
 
 const trendingTopics = [
-  { name: "Next.js 15", posts: 2345 },
-  { name: "React Server Components", posts: 1823 },
-  { name: "TypeScript 5.0", posts: 1502 },
-  { name: "Tailwind CSS", posts: 1245 },
-  { name: "AI Development", posts: 987 },
+  { name: "Pigeon Messanger", posts: 1 },
+  { name: "FluffyRudy", posts: 1 },
+  { name: "Random shit", posts: 1502 },
+  { name: "Another shit", posts: 1245 },
 ];
 
 const suggestedUsers = [
@@ -25,7 +24,6 @@ const upcomingEvents = [
 export default function FeedSidebar() {
   return (
     <div className="space-y-6">
-      {/* Search */}
       <div
         className="p-4 rounded-xl"
         style={{
@@ -51,7 +49,6 @@ export default function FeedSidebar() {
         </div>
       </div>
 
-      {/* Trending Topics */}
       <div
         className="p-4 rounded-xl"
         style={{
@@ -86,7 +83,6 @@ export default function FeedSidebar() {
         </button>
       </div>
 
-      {/* Who to follow */}
       <div
         className="p-4 rounded-xl"
         style={{
@@ -153,7 +149,6 @@ export default function FeedSidebar() {
         </button>
       </div>
 
-      {/* Upcoming Events */}
       <div
         className="p-4 rounded-xl"
         style={{

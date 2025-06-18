@@ -73,7 +73,6 @@ export default function CommentSection({
     setSubmitting(true);
     try {
       const response = await apiClient.createComment(postId, newComment.trim());
-      console.log(response);
       if (response.data) {
         setComments((prev) => [...prev, response.data!]);
         setNewComment("");
@@ -263,7 +262,7 @@ export default function CommentSection({
                         <p className="text-sm">{comment.commentBody}</p>
                       </div>
 
-                      <div className="flex items-center justify-between mt-2 ml-3">
+                      <div className="flex items-center gap-7 mt-2 ml-3">
                         <div className="flex items-center gap-2">
                           <ReactionPicker
                             reactionOnId={comment.commentId.toString()}

@@ -4,40 +4,41 @@ import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
 import { REGISTER_ROUTE, FEEDS_ROUTE } from "@/lib/constants";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
 import FormInput from "@/app/components/ui/FormComponents/FormInput";
 import FormButton from "@/app/components/ui/FormComponents/FormButton";
 import FormAlert from "@/app/components/ui/FormComponents/FormAlert";
+import { useLogin } from "@/app/hooks/useAuth";
 
 export default function Login() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const performLogin = useAppStore((state) => state.login);
+  const { login } = useLogin(FEEDS_ROUTE);
+
+  useEffect(() => {
+    login();
+  }, [login]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    console.log("Login attempt with:", { email, password: "***" });
-
     try {
       const loginResponse = await apiClient.loginUser(email, password);
-      console.log("Login response:", loginResponse);
 
       if (loginResponse.data) {
         const { accessToken, ...other } = loginResponse.data;
-        console.log("Login successful, storing token and user data");
         performLogin(other);
-        console.log(other);
         localStorage.setItem("accessToken", accessToken);
         setSuccess(true);
         setError(null);
@@ -45,7 +46,6 @@ export default function Login() {
           router.push(FEEDS_ROUTE);
         }, 1000);
       } else {
-        console.log("Login failed:", loginResponse.error);
         setError(loginResponse.error);
         setSuccess(false);
       }
@@ -54,8 +54,7 @@ export default function Login() {
       setError((err as Error).message ?? "An unexpected error occurred");
       setSuccess(false);
     } finally {
-      console.log("Setting loading to false");
-      setLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -114,10 +113,10 @@ export default function Login() {
 
             <FormButton
               type="submit"
-              loading={loading}
-              disabled={loading || success}
+              loading={isLoading}
+              disabled={isLoading || success}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </FormButton>
           </form>
 
