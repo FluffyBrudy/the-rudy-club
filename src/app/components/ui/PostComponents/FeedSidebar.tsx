@@ -11,9 +11,9 @@ const trendingTopics = [
 ];
 
 const suggestedUsers = [
-  { username: "jane_dev", name: "Jane Developer", avatar: "" },
-  { username: "tech_guru", name: "Tech Guru", avatar: "" },
-  { username: "code_master", name: "Code Master", avatar: "" },
+  { username: "FluffyRudy", name: "FluffyRudy Developer", avatar: "" },
+  { username: "FluffyBrudy", name: "FluffyBrudy", avatar: "" },
+  { username: "Rudy", name: "Rudy", avatar: "" },
 ];
 
 const upcomingEvents = [
