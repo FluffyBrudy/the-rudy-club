@@ -170,7 +170,7 @@ export default function ReactionPicker({
               )
             );
             setUserReaction(updateResponse.reactionType as ReactionType);
-          } else if (action === "created" && !isAddingReaction) {
+          } else if ((action as unknown) === "created" && !isAddingReaction) {
             const createResponse = response.data as ReactionResponse;
             const currentUser = useAppStore.getState().user;
             const newReaction = {
