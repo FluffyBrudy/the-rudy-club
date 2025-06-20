@@ -2,7 +2,32 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["external-content.duckduckgo.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "duckduckgo.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "external-content.duckduckgo.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "tse2.mm.bing.net",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

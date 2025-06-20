@@ -104,15 +104,15 @@ export default function PostCard({ post }: PostCardProps) {
 
               {post.content.mediaContent &&
                 post.content.mediaContent.length > 0 && (
-                  <div className="mt-3 rounded-xl overflow-hidden">
+                  <div className="mt-3 rounded-xl overflow-hidden flex flex-wrap justify-around gap-1">
                     {post.content.mediaContent.map((media, index) => (
-                      <div key={index} className="relative w-full h-64">
+                      <div key={index} className="h-fit">
                         <Image
-                          src={media || "/placeholder.svg"}
+                          src={media}
                           alt={`Media content ${index + 1}`}
-                          className="object-cover"
-                          fill
-                          style={{ objectFit: "contain" }}
+                          width={300}
+                          height={200}
+                          className="object-contain w-full"
                         />
                       </div>
                     ))}

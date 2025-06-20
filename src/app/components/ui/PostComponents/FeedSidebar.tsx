@@ -17,8 +17,8 @@ const suggestedUsers = [
 ];
 
 const upcomingEvents = [
-  { name: "React Conf 2025", date: "Jun 20, 2025" },
-  { name: "TypeScript Meetup", date: "Jul 5, 2025" },
+  { name: "Bash Tutorial conf", date: "Jun 20, 2025" },
+  { name: "Linux meetup", date: "Jul 5, 2025" },
 ];
 
 export default function FeedSidebar() {

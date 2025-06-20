@@ -48,10 +48,11 @@ export type ReactionResponse = {
   reactionType: string;
   reactorId: string;
   username: string;
+  action: "inserted" | "updated" | "deleted";
 };
 
 export type reactionDisplayInfo = Omit<
-  ReactionResponse,
+  Omit<ReactionResponse, "action">,
   "reactionOnId" | "reactionOnType"
 >[];
 
@@ -59,6 +60,7 @@ export type UndoReactionResponse = {
   undo: true;
   reactionOnId: number;
   reactorId: number;
+  action: "inserted" | "updated" | "deleted";
 };
 
 export type CommentReplyResponse = {
@@ -73,3 +75,13 @@ export type CommentReplyResponse = {
   totalReaction: number;
   reactions: reactionDisplayInfo;
 };
+
+export interface NotificationResponse {
+  notificationId: number;
+  notificationInfo: string;
+  notificationOnType: string;
+  notificationOnId: number;
+  createdAt: string;
+  userId: string;
+  isRead?: boolean;
+}

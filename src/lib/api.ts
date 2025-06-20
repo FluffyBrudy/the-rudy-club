@@ -2,6 +2,7 @@ import axios, {
   type AxiosInstance,
   type AxiosError,
   type AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
 import type {
   LoginResponse,
@@ -9,6 +10,7 @@ import type {
   RegisterResponse,
   CommentResponse,
   CommentReplyResponse,
+  NotificationResponse,
 } from "@/types/apiResponseTypes";
 import {
   ReactionResponse,
@@ -22,9 +24,12 @@ type ErrorResponse = {
   statusText: string;
   data: { error: string };
 };
+type SignatureResponseData = { signature: string; timestamp: number };
+type SignatureResult = Promise<[SignatureResponseData | null, string | null]>;
 
 class ApiClient {
   private axiosInstance: AxiosInstance;
+  private _pendingRequest = [] as InternalAxiosRequestConfig[];
 
   private endpoints = {
     AUTH_LOGIN: "/api/auth/login",
@@ -40,6 +45,26 @@ class ApiClient {
     COMMENT_REPLY_FETCH: "/api/comment/reply/fetch",
 
     REACTION_CREATE: "/api/reaction/create",
+
+    NOTIFICATION_FETCH: "/api/notification/fetch", //get
+    NOTIFICATION_DELETE: "/api/notification/delete", //post body = array[number=id]
+    NOTIFICATION_TOGGLE_READ_STATUS: "/api/notification/toggle-read",
+
+    SOCIAL_FRIENDS_SEARCH: "/social/friends/search",
+    SOCIAL_FRIEND_REQUEST: "/social/friends/requests",
+    SOCIAL_PENDING_REQUESTS: "/social/friends/requests/pending",
+    SOCIAL_ACCEPTED_REQUESTS: "/social/friends/requests/accepted",
+    SOCIAL_ACCEPT_REQUEST: "/social/friends/requests/accept",
+    SOCIAL_REJECT_REQUEST: "/social/friends/requests/reject",
+
+    CHAT_MESSAGE_CREATE: "/chat/message/create",
+    CHAT_MESSAGE_FETCH: "/chat/message/fetch",
+    CHAT_LATEST_SINGLE_MESSAGES: "/chat/message/fetch/latest",
+
+    PREF_PROFILE_SIGNATURE:
+      "https://pigeon-messanger.vercel.app/api/preference/profile/signature",
+    PREF_PROFILE_IMAGE:
+      "https://pigeon-messanger.vercel.app/api/preference/profile/image",
   };
 
   constructor() {
@@ -78,6 +103,10 @@ class ApiClient {
         }
       }
     );
+  }
+
+  private _addFailedRequest(request: InternalAxiosRequestConfig) {
+    this._pendingRequest.push(request);
   }
 
   public get instance(): AxiosInstance {
@@ -175,6 +204,14 @@ class ApiClient {
     mediaContent?: string[];
   }): Promise<TAPIResponse<PostResponse>> {
     try {
+      if (contents.mediaContent) {
+        const response = await this.uploadMultipleParallel(
+          contents.mediaContent
+        );
+        console.log(process.env.NEXT);
+        console.log(response, "***");
+        contents.mediaContent = response;
+      }
       const response = await this.axiosInstance.post(
         this.endpoints.POST_CREATE,
         { contents }
@@ -314,6 +351,126 @@ class ApiClient {
         e.data?.error || e.statusText || "failed to create reaction";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
+  }
+
+  public async fetchNotifications(page = 0) {
+    try {
+      const response = await this.axiosInstance.get(
+        `${this.endpoints.NOTIFICATION_FETCH}?page=${page}`
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as {
+          data: NotificationResponse[];
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reaction", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg =
+        e.data?.error || e.statusText || "failed to create reaction";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async toggleNotificationReadStatus(notificationId: number) {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.NOTIFICATION_TOGGLE_READ_STATUS,
+        {
+          notificationId: notificationId.toString(),
+        }
+      ); //todo: change to patch later not post, modify server router
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as {
+          data: { isRead: boolean };
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reaction", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg =
+        e.data?.error || e.statusText || "failed to create reaction";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  private async generatePrefProfileSignature(): SignatureResult {
+    try {
+      const response = await fetch(this.endpoints.PREF_PROFILE_SIGNATURE, {
+        credentials: "include",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      const data = (await response.json()) as Record<
+        "data",
+        SignatureResponseData
+      >;
+
+      return [data.data, null];
+    } catch (error) {
+      console.error((error as AxiosError).response?.headers);
+      return [null, (error as Error).message];
+    }
+  }
+
+  public async uploadImage(fileOrHtmlString: string | File) {
+    let file: File;
+    if (typeof fileOrHtmlString === "string") {
+      const blob = new Blob([fileOrHtmlString], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      file = new File([blob], Math.random().toString(8) + ".svg", {
+        type: blob.type,
+      });
+    } else {
+      file = fileOrHtmlString;
+    }
+
+    const [data, error] = await this.generatePrefProfileSignature();
+    if (!data || error) return error;
+
+    const { signature, timestamp } = data!;
+    const fileType = file.type.startsWith("video") ? "video" : "image";
+
+    const signatureGenerationKey = process.env.NEXT_PUBLIC_MEDIA_CLOUD_API_KEY;
+    const uploadUrl = process.env.NEXT_PUBLIC_MEDIA_CLOUD_URL;
+    console.log(signatureGenerationKey, uploadUrl);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", signatureGenerationKey!);
+    formData.append("signature", signature);
+    formData.append("timestamp", timestamp.toString());
+    formData.append("folder", "pigeon-messanger");
+    formData.append("resource_type", fileType);
+
+    try {
+      const url =
+        fileType === "video"
+          ? uploadUrl!.replace("image", "video")
+          : uploadUrl!;
+      const resImg = await axios.post(url, formData);
+
+      return resImg.data.secure_url;
+    } catch (error) {
+      const err = error as AxiosResponse;
+      console.error(err.data.error);
+      return null;
+    }
+  }
+
+  public async uploadMultipleParallel(
+    files: (File | string)[]
+  ): Promise<string[]> {
+    const uploadPromises = files.map((file) => this.uploadImage(file));
+    const results = await Promise.all(uploadPromises);
+    return results.filter((url) => !!url) as string[];
   }
 }
 

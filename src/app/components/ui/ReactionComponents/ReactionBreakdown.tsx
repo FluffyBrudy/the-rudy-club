@@ -75,15 +75,12 @@ export default function ReactionBreakdown({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
 
-      {/* Modal Content */}
       <div className="relative w-full max-w-md mx-4 max-h-[80vh] bg-[var(--card-bg)] rounded-2xl shadow-2xl border border-[var(--border-color)] animate-in zoom-in-95 duration-200">
-        {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-[var(--border-color)] bg-gradient-to-r from-[var(--accent-color)]/20 to-transparent rounded-t-2xl">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] flex items-center justify-center">
@@ -106,14 +103,12 @@ export default function ReactionBreakdown({
           </button>
         </div>
 
-        {/* Content */}
         <div className="max-h-[60vh] overflow-y-auto">
           {sortedTypes.map((type) => (
             <div
               key={type}
               className="border-b border-[var(--border-color)]/30 last:border-b-0"
             >
-              {/* Reaction Type Header */}
               <div className="px-6 py-3 flex items-center justify-between bg-[var(--accent-color)]/10 sticky top-0 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-[var(--card-bg)] border-2 border-[var(--border-color)] flex items-center justify-center">
@@ -128,7 +123,6 @@ export default function ReactionBreakdown({
                 </span>
               </div>
 
-              {/* Users List */}
               <div className="divide-y divide-[var(--border-color)]/20">
                 {grouped[type].map((reaction, userIndex) => (
                   <div
@@ -164,7 +158,6 @@ export default function ReactionBreakdown({
           ))}
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--accent-color)]/5 rounded-b-2xl">
           <div className="flex items-center justify-center gap-2 text-sm text-[var(--muted-color)]">
             <div className="flex -space-x-1">
