@@ -50,16 +50,16 @@ class ApiClient {
     NOTIFICATION_DELETE: "/api/notification/delete", //post body = array[number=id]
     NOTIFICATION_TOGGLE_READ_STATUS: "/api/notification/toggle-read",
 
-    SOCIAL_FRIENDS_SEARCH: "/social/friends/search",
-    SOCIAL_FRIEND_REQUEST: "/social/friends/requests",
-    SOCIAL_PENDING_REQUESTS: "/social/friends/requests/pending",
-    SOCIAL_ACCEPTED_REQUESTS: "/social/friends/requests/accepted",
-    SOCIAL_ACCEPT_REQUEST: "/social/friends/requests/accept",
-    SOCIAL_REJECT_REQUEST: "/social/friends/requests/reject",
+    SOCIAL_FRIENDS_SEARCH: "/api/social/friends/search",
+    SOCIAL_FRIEND_REQUEST: "/api/social/friends/requests",
+    SOCIAL_PENDING_REQUESTS: "/api/social/friends/requests/pending",
+    SOCIAL_ACCEPTED_REQUESTS: "/api/social/friends/requests/accepted",
+    SOCIAL_ACCEPT_REQUEST: "/api/social/friends/requests/accept",
+    SOCIAL_REJECT_REQUEST: "/api/social/friends/requests/reject",
 
-    CHAT_MESSAGE_CREATE: "/chat/message/create",
-    CHAT_MESSAGE_FETCH: "/chat/message/fetch",
-    CHAT_LATEST_SINGLE_MESSAGES: "/chat/message/fetch/latest",
+    CHAT_MESSAGE_CREATE: "/api/chat/message/create",
+    CHAT_MESSAGE_FETCH: "/api/chat/message/fetch",
+    CHAT_LATEST_SINGLE_MESSAGES: "/api/chat/message/fetch/latest",
 
     PREF_PROFILE_SIGNATURE:
       "https://pigeon-messanger.vercel.app/api/preference/profile/signature",
@@ -385,6 +385,30 @@ class ApiClient {
       if ([200, 201].includes(response.status)) {
         const data = response.data as {
           data: { isRead: boolean };
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reaction", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg =
+        e.data?.error || e.statusText || "failed to create reaction";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async deleteNotification(notificationIds: number[]) {
+    try {
+      const response = await this.axiosInstance.post(
+        this.endpoints.NOTIFICATION_DELETE,
+        {
+          notificationIds: notificationIds.map((id) => id.toString()),
+        }
+      ); //todo: change to patch later not post, modify server router
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as {
+          data: { count: number };
         };
         return { error: null, data: data.data };
       } else {

@@ -7,12 +7,10 @@ import apiClient from "@/lib/api";
 
 interface NotificationBellProps {
   notifications?: NotificationResponse[];
-  onClearAll?: () => void;
   className?: string;
 }
 
 export default function NotificationBell({
-  onClearAll,
   className = "",
 }: NotificationBellProps) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -75,7 +73,6 @@ export default function NotificationBell({
       .then((res) => {
         if (res.data) {
           setLocalNotifications(res.data);
-          console.log(res.data);
           pageRef.current = page;
         }
       })
@@ -100,14 +97,27 @@ export default function NotificationBell({
   };
 
   const handleClear = (id: number) => {
-    setLocalNotifications((prev) =>
-      prev.filter((notification) => notification.notificationId !== id)
-    );
+    apiClient.deleteNotification([id]).then((res) => {
+      if (res.data) {
+        setLocalNotifications((prev) =>
+          prev.filter((notification) => notification.notificationId !== id)
+        );
+      }
+    });
   };
 
-  const handleClearAll = () => {
-    setLocalNotifications([]);
-    onClearAll?.();
+  const handleClearAll = (notificationIds: number[]) => () => {
+    apiClient.deleteNotification(notificationIds).then((deleteRes) => {
+      if (deleteRes.data) setLocalNotifications([]);
+      apiClient
+        .fetchNotifications(pageRef.current + 1)
+        .then((fetchRes) => {
+          if (fetchRes.data) {
+            setLocalNotifications(fetchRes.data);
+          }
+        })
+        .catch((err) => console.error(err));
+    });
   };
 
   return (
@@ -125,7 +135,7 @@ export default function NotificationBell({
       </button>
 
       {showNotifications && (
-        <div className="absolute right-0 top-full mt-2 z-50 animate-in slide-in-from-top-2 duration-200">
+        <div className="fixed left-0 top-full mt-2 z-50 duration-200 md:left-auto md:right-0 md:absolute">
           <div className="w-80 max-w-[90vw] bg-[var(--card-bg)] rounded-lg shadow-lg border border-[var(--border-color)]">
             <div className="flex items-center justify-between p-3 border-b border-[var(--border-color)]">
               <div className="flex items-center gap-2">
@@ -143,7 +153,11 @@ export default function NotificationBell({
               <div className="flex items-center gap-1">
                 {localNotifications.length > 0 && (
                   <button
-                    onClick={handleClearAll}
+                    onClick={handleClearAll(
+                      localNotifications.map(
+                        ({ notificationId }) => notificationId
+                      )
+                    )}
                     className="p-1 text-[var(--muted-color)] hover:text-red-500 transition-colors ml-1"
                     title="Clear all"
                   >

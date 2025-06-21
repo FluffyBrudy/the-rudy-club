@@ -1,4 +1,4 @@
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import NotificationBell from "../NotificationComponents/NotificationBell";
 
 export default function NavIcons({ onSearch }: { onSearch: () => void }) {
@@ -7,9 +7,7 @@ export default function NavIcons({ onSearch }: { onSearch: () => void }) {
       <button
         onClick={onSearch}
         className="p-2 rounded-xl hover:bg-accent/50 transition-colors duration-200 relative group"
-      >
-        <Search className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
-      </button>
+      ></button>
       <div className="p-2 rounded-xl hover:bg-accent/50 transition-colors duration-200 relative">
         <NotificationBell />
       </div>

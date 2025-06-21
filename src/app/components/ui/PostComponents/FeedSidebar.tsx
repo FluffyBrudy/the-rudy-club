@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, TrendingUp, Users, Calendar } from "lucide-react";
+import { TrendingUp, Users, Calendar } from "lucide-react";
 import Image from "next/image";
 
 const trendingTopics = [
@@ -24,31 +24,6 @@ const upcomingEvents = [
 export default function FeedSidebar() {
   return (
     <div className="space-y-6">
-      <div
-        className="p-4 rounded-xl"
-        style={{
-          backgroundColor: "var(--card-bg)",
-          border: "1px solid var(--border-color)",
-        }}
-      >
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
-            style={{ color: "var(--muted-color)" }}
-          />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-20"
-            style={{
-              backgroundColor: "var(--input-bg)",
-              border: "1px solid var(--input-border)",
-              color: "var(--text-color)",
-            }}
-          />
-        </div>
-      </div>
-
       <div
         className="p-4 rounded-xl"
         style={{
