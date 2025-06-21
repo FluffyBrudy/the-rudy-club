@@ -5,7 +5,6 @@ import SearchModal from "@/app/components/ui/SearchModel";
 
 import Logo from "@/app/components/ui/NavComponents/Logo";
 import DesktopNav from "@/app/components/ui/NavComponents/DesktopNav";
-import NavIcons from "@/app/components/ui/NavComponents/NavIcons";
 import MobileMenu from "@/app/components/ui/NavComponents/MobileMenu";
 import ToggleMenuIcon from "@/app/components/ui/NavComponents/MobileMenuIcon";
 import ThemeSwitcher from "./ThemeSwitcher";
