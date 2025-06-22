@@ -1,16 +1,8 @@
 "use client";
 
-import type React from "react";
-
+import React from "react";
 import { useState, useEffect, useRef } from "react";
-import {
-  Search,
-  X,
-  Clock,
-  TrendingUp,
-  ArrowRight,
-  Command,
-} from "lucide-react";
+import { Search, X, Hash, Sparkles, ArrowUpRight } from "lucide-react";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -18,48 +10,59 @@ interface SearchModalProps {
 }
 
 const recentSearches = [
-  "React components",
-  "Next.js routing",
-  "Tailwind CSS",
-  "TypeScript tips",
+  {
+    type: "user",
+    name: "sarah_dev",
+    avatar: "/placeholder.svg?height=32&width=32",
+  },
+  { type: "hashtag", name: "webdev" },
+  {
+    type: "user",
+    name: "john_designer",
+    avatar: "/placeholder.svg?height=32&width=32",
+  },
+  { type: "hashtag", name: "reactjs" },
 ];
 
-const trendingSearches = [
-  "Social Media",
-  "Dark mode",
-  "Authentication",
-  "Database setup",
-  "API routes",
+const trendingTopics = [
+  { name: "javascript", posts: "2.1k posts" },
+  { name: "design", posts: "1.8k posts" },
+  { name: "startup", posts: "956 posts" },
+  { name: "ai", posts: "3.2k posts" },
+  { name: "coding", posts: "1.5k posts" },
 ];
 
 const searchResults = [
   {
     id: 1,
-    title: "Getting Started with Next.js",
-    description:
-      "Learn the basics of Next.js and how to build modern web applications",
-    category: "Tutorial",
-    url: "/tutorials/nextjs-basics",
+    type: "user",
+    name: "Alex Chen",
+    username: "alexchen_dev",
+    avatar: "/placeholder.svg?height=40&width=40",
+    verified: true,
+    followers: "12.5k followers",
   },
   {
     id: 2,
-    title: "Advanced React Patterns",
-    description:
-      "Explore advanced React patterns and best practices for scalable applications",
-    category: "Guide",
-    url: "/guides/react-patterns",
+    type: "user",
+    name: "Maria Garcia",
+    username: "maria_ux",
+    avatar: "/placeholder.svg?height=40&width=40",
+    verified: false,
+    followers: "8.2k followers",
   },
   {
     id: 3,
-    title: "Building APIs with Next.js",
-    description:
-      "Create robust APIs using Next.js API routes and server actions",
-    category: "Tutorial",
-    url: "/tutorials/nextjs-api",
+    type: "hashtag",
+    name: "webdevelopment",
+    posts: "45.2k posts",
   },
 ];
 
-export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+export default function SearchModal({
+  isOpen = true,
+  onClose = () => {},
+}: SearchModalProps) {
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -67,17 +70,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
-
-      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
       setQuery("");
       setShowResults(false);
     }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -114,76 +110,96 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      <div className="relative w-full max-w-2xl mx-4 mt-16 sm:mt-24">
-        <div className="bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300">
-          <div className="flex items-center px-6 py-4 border-b border-border/50">
-            <Search className="h-5 w-5 text-muted-foreground mr-3" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={handleInputChange}
-              placeholder="Search anything..."
-              className="flex-1 bg-transparent text-lg placeholder:text-muted-foreground focus:outline-none"
-            />
-            <div className="flex items-center space-x-2">
-              <kbd className="hidden sm:inline-flex h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
-                <Command className="h-3 w-3" />K
-              </kbd>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-accent/50 rounded-xl transition-colors duration-200"
-              >
-                <X className="h-5 w-5 text-muted-foreground" />
-              </button>
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black bg-opacity-40 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg mt-12 sm:mt-20">
+        <div className="bg-gray-900 border border-gray-700 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300">
+          <div className="flex items-center px-6 py-4 border-b border-gray-700">
+            <div className="flex items-center flex-1">
+              <div className="p-2 rounded-full mr-3 bg-gray-800">
+                <Search className="h-4 w-4 text-blue-400" />
+              </div>
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={handleInputChange}
+                placeholder="Search people and topics..."
+                className="flex-1 text-base bg-transparent text-white placeholder-gray-400 focus:outline-none border-0"
+              />
             </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-all duration-200"
+            >
+              <X className="h-4 w-4 text-gray-400" />
+            </button>
           </div>
 
           <div className="max-h-96 overflow-y-auto">
             {!showResults ? (
               <div className="p-6 space-y-6">
                 <div>
-                  <div className="flex items-center mb-3">
-                    <Clock className="h-4 w-4 text-muted-foreground mr-2" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Recent
-                    </h3>
-                  </div>
-                  <div className="space-y-1">
+                  <h3 className="text-sm font-semibold mb-4 flex items-center text-white">
+                    <div className="w-2 h-2 rounded-full mr-2 bg-blue-400" />
+                    Recent
+                  </h3>
+                  <div className="space-y-2">
                     {recentSearches.map((search, index) => (
                       <button
                         key={index}
-                        onClick={() => handleSearch(search)}
-                        className="flex items-center w-full px-3 py-2 text-left rounded-xl hover:bg-accent/50 transition-colors duration-200 group"
+                        onClick={() => handleSearch(search.name)}
+                        className="flex items-center w-full p-3 text-left rounded-2xl hover:bg-gray-800 transition-all duration-200 group"
                       >
-                        <span className="text-sm">{search}</span>
-                        <ArrowRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        {search.type === "user" ? (
+                          <>
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mr-3 flex-shrink-0">
+                              <span className="text-white text-sm font-medium">
+                                {search.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="flex-1 text-white">
+                              @{search.name}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 flex-shrink-0 bg-blue-500">
+                              <Hash className="h-4 w-4 text-white" />
+                            </div>
+                            <span className="flex-1 text-white">
+                              #{search.name}
+                            </span>
+                          </>
+                        )}
+                        <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 text-gray-400" />
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex items-center mb-3">
-                    <TrendingUp className="h-4 w-4 text-muted-foreground mr-2" />
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      Trending
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {trendingSearches.map((search, index) => (
+                  <h3 className="text-sm font-semibold mb-4 flex items-center text-white">
+                    <Sparkles className="h-4 w-4 mr-2 text-blue-400" />
+                    Trending
+                  </h3>
+                  <div className="space-y-2">
+                    {trendingTopics.map((topic, index) => (
                       <button
                         key={index}
-                        onClick={() => handleSearch(search)}
-                        className="px-3 py-1.5 bg-accent/30 hover:bg-accent/50 rounded-full text-sm transition-colors duration-200"
+                        onClick={() => handleSearch(topic.name)}
+                        className="flex items-center justify-between w-full p-3 text-left rounded-2xl hover:bg-gray-800 transition-all duration-200"
                       >
-                        {search}
+                        <div className="flex items-center flex-1">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 flex-shrink-0 bg-blue-500">
+                            <Hash className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-white">#{topic.name}</div>
+                            <div className="text-xs text-gray-400">
+                              {topic.posts}
+                            </div>
+                          </div>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -192,8 +208,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             ) : (
               <div className="p-6">
                 <div className="mb-4">
-                  <p className="text-sm text-muted-foreground">
-                    {searchResults.length} results for &quot;{query}&quot;
+                  <p className="text-sm text-gray-400">
+                    {searchResults.length} results for {`'${query}'`}
                   </p>
                 </div>
                 <div className="space-y-3">
@@ -203,20 +219,50 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       onClick={() => {
                         onClose();
                       }}
-                      className="flex flex-col items-start w-full p-4 text-left rounded-xl hover:bg-accent/50 transition-colors duration-200 group"
+                      className="flex items-center w-full p-4 text-left rounded-2xl hover:bg-gray-800 transition-all duration-200 group"
                     >
-                      <div className="flex items-center w-full mb-1">
-                        <span className="text-xs font-medium text-lime-600 dark:text-lime-400 bg-lime-100 dark:bg-lime-900/30 px-2 py-0.5 rounded-full">
-                          {result.category}
-                        </span>
-                        <ArrowRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      </div>
-                      <h4 className="font-medium mb-1 group-hover:text-lime-600 dark:group-hover:text-lime-400 transition-colors duration-200">
-                        {result.title}
-                      </h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {result.description}
-                      </p>
+                      {result.type === "user" ? (
+                        <>
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center mr-4 flex-shrink-0">
+                            <span className="text-white text-lg font-medium">
+                              {result.name.charAt(0)}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <span className="font-semibold text-white">
+                                {result.name}
+                              </span>
+                              {result.verified && (
+                                <div className="w-4 h-4 rounded-full flex items-center justify-center ml-1 flex-shrink-0 bg-blue-500">
+                                  <div className="w-2 h-2 bg-white rounded-full" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              @{result.username}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {result.followers}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4 flex-shrink-0 bg-blue-500">
+                            <Hash className="h-6 w-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-white">
+                              #{result.name}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              {result.posts}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      <ArrowUpRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 text-blue-400" />
                     </button>
                   ))}
                 </div>
@@ -224,12 +270,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             )}
           </div>
 
-          <div className="px-6 py-3 border-t border-border/50 bg-accent/20">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Press ESC to close</span>
-              <div className="flex items-center space-x-4">
-                <span>↵ to select</span>
-              </div>
+          <div className="px-6 py-3 border-t border-gray-700 bg-gray-800">
+            <div className="flex items-center justify-center">
+              <span className="text-xs text-gray-400">
+                Press ESC to close • ↵ to select
+              </span>
             </div>
           </div>
         </div>

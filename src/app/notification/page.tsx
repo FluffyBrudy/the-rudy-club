@@ -1,4 +1,4 @@
-import NotificationsContainer from "@/app/components/ui/NotificationComponents/NotificationBell";
+import NotificationsContainer from "@/app/components/NotificationComponents/NotificationBell";
 
 export default function Page() {
   return (

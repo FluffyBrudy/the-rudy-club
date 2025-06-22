@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import PostCard from "@/app/components/ui/PostComponents/PostCard";
-import CreatePostForm from "@/app/components/ui/PostComponents/CreatePostForm";
-import FeedSidebar from "@/app/components/ui/PostComponents/FeedSidebar";
+import PostCard from "@/app/components/PostComponents/PostCard";
+import CreatePostForm from "@/app/components/PostComponents/CreatePostForm";
+import FeedSidebar from "@/app/components/PostComponents/FeedSidebar";
 import { Loader2 } from "lucide-react";
 
 export default function Feeds() {
