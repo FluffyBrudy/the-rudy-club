@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { User, Home, LogOut, Menu, X, Search } from "lucide-react";
 import Image from "next/image";
-import { navLinks } from "@/lib/nav";
+import { navItems } from "@/lib/nav";
+import { getIcon } from "@/lib/navIcons";
 import { useAppStore } from "@/app/store/appStore";
 import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/constants";
 import ThemeSwitcher from "@/app/components/ui/ThemeSwitcher";
 import NotificationBell from "@/app/components/NotificationComponents/NotificationBell";
+import type { NavActionHandler } from "@/lib/navActions";
 
 interface MobileNavProps {
   onSearchOpen: () => void;
@@ -22,11 +23,6 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
   const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
 
-  const filteredLinks = navLinks.filter(
-    (link) =>
-      (user && link.postAuthVisibility) || (!user && link.preAuthVisibility)
-  );
-
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
@@ -36,9 +32,124 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
     router.push("/");
   };
 
+  const actions: NavActionHandler = {
+    openSearch: () => {
+      onSearchOpen();
+      closeMenu();
+    },
+    openProfile: () => {
+      console.log("Profile clicked");
+      closeMenu();
+    },
+    logout: handleLogout,
+  };
+
+  const getFilteredItems = (section: string) => {
+    return navItems
+      .filter(
+        (item) =>
+          item.section === section &&
+          ((user && item.postAuthVisibility) ||
+            (!user && item.preAuthVisibility))
+      )
+      .sort((a, b) => a.order - b.order);
+  };
+
+  const renderNavItem = (item: (typeof navItems)[0]) => {
+    const IconComponent = item.icon ? getIcon(item.icon) : null;
+
+    if (item.type === "link") {
+      const isActive = pathname === item.href;
+      const href = user && item.href === ROOT_ROUTE ? FEEDS_ROUTE : item.href!;
+
+      if (user && item.href === ROOT_ROUTE) return null;
+
+      return (
+        <Link
+          key={item.id}
+          href={href}
+          onClick={closeMenu}
+          className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+            isActive ? "text-white" : "hover:bg-accent/50"
+          }`}
+          style={{
+            backgroundColor: isActive ? "var(--primary-color)" : "transparent",
+            color: isActive ? "white" : "var(--text-color)",
+          }}
+        >
+          {IconComponent && <IconComponent className="h-5 w-5 mr-3" />}
+          <span className="capitalize">{item.name}</span>
+          {isActive && (
+            <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
+          )}
+        </Link>
+      );
+    }
+
+    if (item.type === "button" && item.action) {
+      const actionHandler = actions[item.action as keyof NavActionHandler];
+      const isLogout = item.action === "logout";
+
+      return (
+        <button
+          key={item.id}
+          onClick={actionHandler}
+          className={`flex items-center w-full px-4 py-3 rounded-xl transition-colors duration-200 ${
+            isLogout
+              ? "hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+              : "hover:bg-accent/50"
+          }`}
+        >
+          {IconComponent && (
+            <IconComponent
+              className="h-5 w-5 mr-3"
+              style={{ color: isLogout ? "inherit" : "var(--muted-color)" }}
+            />
+          )}
+          <span
+            className="text-sm font-medium capitalize"
+            style={{ color: isLogout ? "inherit" : "var(--text-color)" }}
+          >
+            {item.name}
+          </span>
+          {item.action === "openSearch" && (
+            <span
+              className="ml-auto text-xs"
+              style={{ color: "var(--muted-color)" }}
+            >
+              ⌘K
+            </span>
+          )}
+        </button>
+      );
+    }
+
+    if (item.type === "component") {
+      if (item.component === "NotificationBell") {
+        return <NotificationBell key={item.id} />;
+      }
+      if (item.component === "ThemeSwitcher") {
+        return <ThemeSwitcher key={item.id} />;
+      }
+    }
+
+    return null;
+  };
+
+  const MenuIcon = getIcon("Menu");
+  const XIcon = getIcon("X");
+  const topBarActions = getFilteredItems("actions").filter(
+    (item) =>
+      item.component === "NotificationBell" ||
+      item.component === "ThemeSwitcher"
+  );
+  const mainItems = getFilteredItems("main");
+  const actionItems = getFilteredItems("actions").filter(
+    (item) => item.type === "button" || item.type === "link"
+  );
+
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
@@ -46,25 +157,30 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
         />
       )}
 
-      {/* Mobile Header Actions */}
       <div className="flex items-center space-x-2 md:hidden">
-        {user && <NotificationBell />}
-        <ThemeSwitcher />
+        {topBarActions.map(renderNavItem)}
         <button
           onClick={toggleMenu}
           className="p-2 rounded-xl hover:bg-accent/50 transition-all duration-200 active:scale-95"
           aria-label="Toggle menu"
           aria-expanded={isOpen}
         >
-          {isOpen ? (
-            <X className="h-6 w-6" style={{ color: "var(--text-color)" }} />
-          ) : (
-            <Menu className="h-6 w-6" style={{ color: "var(--text-color)" }} />
-          )}
+          {isOpen
+            ? XIcon && (
+                <XIcon
+                  className="h-6 w-6"
+                  style={{ color: "var(--text-color)" }}
+                />
+              )
+            : MenuIcon && (
+                <MenuIcon
+                  className="h-6 w-6"
+                  style={{ color: "var(--text-color)" }}
+                />
+              )}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={`fixed top-16 right-0 h-[calc(100vh-4rem)] w-80 bg-background/95 backdrop-blur-xl border-l shadow-2xl transform transition-transform duration-300 ease-out z-50 md:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -75,7 +191,6 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
         }}
       >
         <div className="flex flex-col h-full">
-          {/* User Profile Section */}
           {user && (
             <div
               className="p-4 border-b"
@@ -118,122 +233,11 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
             </div>
           )}
 
-          {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto py-4">
             <div className="space-y-1 px-4">
-              {/* Search Button */}
-              <button
-                onClick={() => {
-                  onSearchOpen();
-                  closeMenu();
-                }}
-                className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-accent/50 transition-colors duration-200"
-              >
-                <Search
-                  className="h-5 w-5 mr-3"
-                  style={{ color: "var(--muted-color)" }}
-                />
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "var(--text-color)" }}
-                >
-                  Search
-                </span>
-                <span
-                  className="ml-auto text-xs"
-                  style={{ color: "var(--muted-color)" }}
-                >
-                  ⌘K
-                </span>
-              </button>
-
-              {user && (
-                <Link
-                  href={FEEDS_ROUTE}
-                  onClick={closeMenu}
-                  className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                    pathname === FEEDS_ROUTE
-                      ? "text-white"
-                      : "hover:bg-accent/50"
-                  }`}
-                  style={{
-                    backgroundColor:
-                      pathname === FEEDS_ROUTE
-                        ? "var(--primary-color)"
-                        : "transparent",
-                    color:
-                      pathname === FEEDS_ROUTE ? "white" : "var(--text-color)",
-                  }}
-                >
-                  <Home className="h-5 w-5 mr-3" />
-                  <span>Home</span>
-                  {pathname === FEEDS_ROUTE && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
-                  )}
-                </Link>
-              )}
-
-              {filteredLinks.map((link) => {
-                const isActive = pathname === link.href;
-                const href =
-                  user && link.href === ROOT_ROUTE ? FEEDS_ROUTE : link.href;
-
-                if (user && link.href === ROOT_ROUTE) return null;
-
-                return (
-                  <Link
-                    key={link.name}
-                    href={href}
-                    onClick={closeMenu}
-                    className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                      isActive ? "text-white" : "hover:bg-accent/50"
-                    }`}
-                    style={{
-                      backgroundColor: isActive
-                        ? "var(--primary-color)"
-                        : "transparent",
-                      color: isActive ? "white" : "var(--text-color)",
-                    }}
-                  >
-                    <span className="capitalize">{link.name}</span>
-                    {isActive && (
-                      <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
-                    )}
-                  </Link>
-                );
-              })}
+              {mainItems.map(renderNavItem)}
+              {actionItems.map(renderNavItem)}
             </div>
-          </div>
-
-          {/* Footer Actions */}
-          <div
-            className="p-4 border-t space-y-3"
-            style={{ borderColor: "var(--border-color)" }}
-          >
-            {user && (
-              <button className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-accent/50 transition-colors duration-200">
-                <User
-                  className="h-5 w-5 mr-3"
-                  style={{ color: "var(--muted-color)" }}
-                />
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "var(--text-color)" }}
-                >
-                  Profile
-                </span>
-              </button>
-            )}
-
-            {user && (
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-red-600 dark:text-red-400"
-              >
-                <LogOut className="h-5 w-5 mr-3" />
-                <span className="text-sm font-medium">Sign Out</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
