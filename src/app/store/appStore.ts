@@ -5,7 +5,7 @@ import { createAuthSlice } from "./slice/authSlice";
 import { createPostSlice } from "./slice/postSlice";
 import { createCommentSlice } from "./slice/commentSlice";
 import { createReplySlice } from "./slice/replySlice";
-import { USER_STORE } from "@/lib/constants";
+import { USER_STORE } from "@/lib/router";
 
 export const useAppStore = create<AppState>()(
   devtools(

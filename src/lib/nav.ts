@@ -3,7 +3,7 @@ import {
   LOGIN_ROUTE,
   REGISTER_ROUTE,
   ROOT_ROUTE,
-} from "./constants";
+} from "./router";
 
 export type NavItemType = "link" | "button" | "component";
 

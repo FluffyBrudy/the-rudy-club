@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Users } from "lucide-react";
 import User from "@/app/components/ui/User";
 import UserCard from "@/app/components/ui/UserCard";
+import apiClient from "@/lib/api";
 
 interface Friend {
   id: string;
@@ -51,11 +52,11 @@ export default function ConnectedFriends() {
   ];
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      setFriends(mockFriends);
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(id);
+    const fetchFriends = async () => {
+      const connectedFriends = await apiClient.RetriveConnectedFriends();
+      console.log(connectedFriends);
+    };
+    fetchFriends();
   }, []);
 
   const filteredFriends = friends.filter((friend) =>

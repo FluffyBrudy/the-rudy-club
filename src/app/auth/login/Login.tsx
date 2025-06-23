@@ -2,27 +2,19 @@
 
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import { REGISTER_ROUTE, FEEDS_ROUTE } from "@/lib/constants";
-import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useState } from "react";
+import { REGISTER_ROUTE } from "@/lib/router";
+import { type FormEvent, useState } from "react";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
 import FormInput from "@/app/components/FormComponents/FormInput";
 import FormButton from "@/app/components/FormComponents/FormButton";
 import FormAlert from "@/app/components/FormComponents/FormAlert";
-import { useLogin } from "@/app/hooks/useAuth";
 
 export default function Login() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
+  const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const performLogin = useAppStore((state) => state.login);
-  const { login } = useLogin(FEEDS_ROUTE);
-
-  useEffect(() => {
-    login();
-  }, [login]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,19 +32,17 @@ export default function Login() {
         const { accessToken, ...other } = loginResponse.data;
         performLogin(other);
         localStorage.setItem("accessToken", accessToken);
-        setSuccess(true);
+        setLoginSuccess(true);
         setError(null);
-        setTimeout(() => {
-          router.push(FEEDS_ROUTE);
-        }, 1000);
+        window.location.reload();
       } else {
         setError(loginResponse.error);
-        setSuccess(false);
+        setLoginSuccess(false);
       }
     } catch (err) {
       console.error("Login error:", err);
       setError((err as Error).message ?? "An unexpected error occurred");
-      setSuccess(false);
+      setLoginSuccess(false);
     } finally {
       setIsLoading(false);
     }
@@ -104,17 +94,17 @@ export default function Login() {
             />
 
             {error && <FormAlert type="error" message={error} />}
-            {success && (
+            {loginSuccess && (
               <FormAlert
                 type="success"
-                message="Login successful! Redirecting..."
+                message="Login loginSuccessful! Redirecting..."
               />
             )}
 
             <FormButton
               type="submit"
               loading={isLoading}
-              disabled={isLoading || success}
+              disabled={isLoading || loginSuccess}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </FormButton>

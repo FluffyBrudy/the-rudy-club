@@ -16,7 +16,6 @@ import {
   ReactionResponse,
   UndoReactionResponse,
 } from "@/types/apiResponseTypes";
-import { USER_STORE } from "./constants";
 
 type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
 type ErrorResponse = {
@@ -30,6 +29,7 @@ type SignatureResult = Promise<[SignatureResponseData | null, string | null]>;
 class ApiClient {
   private axiosInstance: AxiosInstance;
   private _pendingRequest = [] as InternalAxiosRequestConfig[];
+  private pigeonBaseUrl = process.env.NEXT_PUBLIC_PIGEON_API_URL!;
 
   private endpoints = {
     AUTH_LOGIN: "/api/auth/login",
@@ -50,21 +50,19 @@ class ApiClient {
     NOTIFICATION_DELETE: "/api/notification/delete", //post body = array[number=id]
     NOTIFICATION_TOGGLE_READ_STATUS: "/api/notification/toggle-read",
 
-    SOCIAL_FRIENDS_SEARCH: "/api/social/friends/search",
-    SOCIAL_FRIEND_REQUEST: "/api/social/friends/requests",
-    SOCIAL_PENDING_REQUESTS: "/api/social/friends/requests/pending",
-    SOCIAL_ACCEPTED_REQUESTS: "/api/social/friends/requests/accepted",
-    SOCIAL_ACCEPT_REQUEST: "/api/social/friends/requests/accept",
-    SOCIAL_REJECT_REQUEST: "/api/social/friends/requests/reject",
+    SOCIAL_FRIENDS_SEARCH: `${this.pigeonBaseUrl}/api/social/friends/search`,
+    SOCIAL_FRIEND_REQUEST: `${this.pigeonBaseUrl}/api/social/friends/requests`,
+    SOCIAL_PENDING_REQUESTS: `${this.pigeonBaseUrl}/api/social/friends/requests/pending`,
+    SOCIAL_ACCEPTED_REQUESTS: `${this.pigeonBaseUrl}/api/social/friends/requests/accepted`,
+    SOCIAL_ACCEPT_REQUEST: `${this.pigeonBaseUrl}/api/social/friends/requests/accept`,
+    SOCIAL_REJECT_REQUEST: `${this.pigeonBaseUrl}/api/social/friends/requests/reject`,
 
-    CHAT_MESSAGE_CREATE: "/api/chat/message/create",
-    CHAT_MESSAGE_FETCH: "/api/chat/message/fetch",
-    CHAT_LATEST_SINGLE_MESSAGES: "/api/chat/message/fetch/latest",
+    CHAT_MESSAGE_CREATE: `${this.pigeonBaseUrl}/api/chat/message/create`,
+    CHAT_MESSAGE_FETCH: `${this.pigeonBaseUrl}/api/chat/message/fetch`,
+    CHAT_LATEST_SINGLE_MESSAGES: `${this.pigeonBaseUrl}/api/chat/message/fetch/latest`,
 
-    PREF_PROFILE_SIGNATURE:
-      "https://pigeon-messanger.vercel.app/api/preference/profile/signature",
-    PREF_PROFILE_IMAGE:
-      "https://pigeon-messanger.vercel.app/api/preference/profile/image",
+    PREF_PROFILE_SIGNATURE: `${this.pigeonBaseUrl}/api/preference/profile/signature`,
+    PREF_PROFILE_IMAGE: `${this.pigeonBaseUrl}/api/preference/profile/image`,
   };
 
   constructor() {
@@ -95,7 +93,7 @@ class ApiClient {
         if (response) {
           const { data, status, statusText } = response;
           if (data && (data as { error: string }).error === "jwt expired") {
-            sessionStorage.removeItem(USER_STORE);
+            // todo: refresh token later
           }
           return Promise.reject({ data, status, statusText });
         } else {
@@ -418,6 +416,26 @@ class ApiClient {
       const e = error as ErrorResponse;
       const errMsg =
         e.data?.error || e.statusText || "failed to create reaction";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  public async RetriveConnectedFriends() {
+    try {
+      const response = await axios.post(
+        this.endpoints.SOCIAL_ACCEPTED_REQUESTS
+      );
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as {
+          data: unknown;
+        };
+        return { error: null, data: data.data };
+      } else {
+        return { error: "failed to create reaction", data: null };
+      }
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data?.error || e.statusText || "failed to fetch friends";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }
