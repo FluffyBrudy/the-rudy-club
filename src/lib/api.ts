@@ -423,7 +423,7 @@ class ApiClient {
   public async RetriveConnectedFriends() {
     try {
       const response = await axios.post(
-        `{https://pigeon-messanger.vercel.app}${this.endpoints.SOCIAL_ACCEPTED_REQUESTS}`
+        this.endpoints.SOCIAL_ACCEPTED_REQUESTS
       );
       if ([200, 201].includes(response.status)) {
         const data = response.data as {
@@ -434,7 +434,6 @@ class ApiClient {
         return { error: "failed to create reaction", data: null };
       }
     } catch (error) {
-      console.log(error);
       const e = error as ErrorResponse;
       const errMsg = e.data?.error || e.statusText || "failed to fetch friends";
       return { error: `${e.status}:${errMsg}`, data: null };
