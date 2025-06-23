@@ -2,8 +2,7 @@
 
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import { REGISTER_ROUTE, FEEDS_ROUTE } from "@/lib/router";
-import { useRouter } from "next/navigation";
+import { REGISTER_ROUTE } from "@/lib/router";
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
@@ -12,7 +11,6 @@ import FormButton from "@/app/components/FormComponents/FormButton";
 import FormAlert from "@/app/components/FormComponents/FormAlert";
 
 export default function Login() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,9 +34,7 @@ export default function Login() {
         localStorage.setItem("accessToken", accessToken);
         setLoginSuccess(true);
         setError(null);
-        setTimeout(() => {
-          router.push(FEEDS_ROUTE);
-        }, 1000);
+        window.location.reload();
       } else {
         setError(loginResponse.error);
         setLoginSuccess(false);

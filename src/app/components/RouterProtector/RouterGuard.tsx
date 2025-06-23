@@ -12,9 +12,13 @@ import { type ReactNode, useEffect } from "react";
 
 interface AuthRouteGuardProps {
   children: ReactNode;
+  fallbackElement?: ReactNode;
 }
 
-export function AuthRouterGuard({ children }: AuthRouteGuardProps) {
+export function AuthRouterGuard({
+  children,
+  fallbackElement,
+}: AuthRouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { error, loading, success } = useAutoLogin();
@@ -28,12 +32,13 @@ export function AuthRouterGuard({ children }: AuthRouteGuardProps) {
       router.replace(FEEDS_ROUTE);
     } else if (!success && routeType === "protected") {
       console.error(error);
+      sessionStorage.clear();
       router.replace(LOGIN_ROUTE);
     }
   }, [loading, success, routeType, router, error]);
 
   if (routeType === "protected") {
-    if (loading) return <div>Authenticating...</div>;
+    if (loading) return <div>{fallbackElement ?? null}</div>;
     if (!success) return null;
   }
 

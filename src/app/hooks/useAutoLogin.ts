@@ -31,7 +31,6 @@ export function useAutoLogin() {
         });
       }
     };
-
     attemptAutoLogin();
   }, [performLogin]);
 
