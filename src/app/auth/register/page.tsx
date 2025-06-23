@@ -1,7 +1,7 @@
 "use client";
 
 import apiClient from "@/lib/api";
-import { FEEDS_ROUTE, LOGIN_ROUTE } from "@/lib/constants";
+import { FEEDS_ROUTE, LOGIN_ROUTE } from "@/lib/router";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { UserPlus } from "lucide-react";
 import FormInput from "@/app/components/FormComponents/FormInput";
 import FormButton from "@/app/components/FormComponents/FormButton";
 import FormAlert from "@/app/components/FormComponents/FormAlert";
-import { useLogin } from "@/app/hooks/useAuth";
+import { useLogin } from "@/app/hooks/useAutoLogin";
 
 export default function Register() {
   const router = useRouter();

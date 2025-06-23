@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { navItems } from "@/lib/nav";
 import { getIcon } from "@/lib/navIcons";
 import { useAppStore } from "@/app/store/appStore";
-import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/constants";
+import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/router";
 import ThemeSwitcher from "@/app/components/ui/ThemeSwitcher";
 import NotificationBell from "@/app/components/NotificationComponents/NotificationBell";
 import type { NavActionHandler } from "@/lib/navActions";

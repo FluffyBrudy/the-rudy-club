@@ -16,7 +16,7 @@ import {
   ReactionResponse,
   UndoReactionResponse,
 } from "@/types/apiResponseTypes";
-import { USER_STORE } from "./constants";
+import { USER_STORE } from "./router";
 
 type TAPIResponse<T> = { error: null; data: T } | { error: string; data: null };
 type ErrorResponse = {
