@@ -11,6 +11,7 @@ import type {
   CommentResponse,
   CommentReplyResponse,
   NotificationResponse,
+  ConnectedFriendsResponse,
 } from "@/types/apiResponseTypes";
 import {
   ReactionResponse,
@@ -422,12 +423,18 @@ class ApiClient {
 
   public async RetriveConnectedFriends() {
     try {
-      const response = await axios.post(
-        this.endpoints.SOCIAL_ACCEPTED_REQUESTS
+      const response = await axios.get(
+        this.endpoints.SOCIAL_ACCEPTED_REQUESTS,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if ([200, 201].includes(response.status)) {
         const data = response.data as {
-          data: unknown;
+          data: ConnectedFriendsResponse[];
         };
         return { error: null, data: data.data };
       } else {

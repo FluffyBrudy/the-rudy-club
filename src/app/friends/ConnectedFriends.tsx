@@ -5,56 +5,21 @@ import { Search, Users } from "lucide-react";
 import User from "@/app/components/ui/User";
 import UserCard from "@/app/components/ui/UserCard";
 import apiClient from "@/lib/api";
-
-interface Friend {
-  id: string;
-  username: string;
-  picture?: string | null;
-}
+import { ConnectedFriendsResponse } from "@/types/apiResponseTypes";
 
 export default function ConnectedFriends() {
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<ConnectedFriendsResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
 
-  const mockFriends: Friend[] = [
-    {
-      id: "1",
-      username: "john_doe",
-      picture: null,
-    },
-    {
-      id: "2",
-      username: "jane_smith",
-      picture: null,
-    },
-    {
-      id: "3",
-      username: "alex_wilson",
-      picture: null,
-    },
-    {
-      id: "4",
-      username: "sarah_johnson",
-      picture: null,
-    },
-    {
-      id: "5",
-      username: "mike_brown",
-      picture: null,
-    },
-    {
-      id: "6",
-      username: "emily_davis",
-      picture: null,
-    },
-  ];
-
   useEffect(() => {
     const fetchFriends = async () => {
       const connectedFriends = await apiClient.RetriveConnectedFriends();
-      console.log(connectedFriends);
+      if (connectedFriends.data) {
+        setLoading(false);
+        setFriends(connectedFriends.data);
+      }
     };
     fetchFriends();
   }, []);
@@ -186,16 +151,16 @@ export default function ConnectedFriends() {
           {filteredFriends.map((friend) =>
             viewMode === "grid" ? (
               <UserCard
-                key={friend.id}
-                id={friend.id}
+                key={friend.userId}
+                id={friend.userId}
                 username={friend.username}
-                picture={friend.picture}
+                picture={friend.imageUrl}
                 onUserClick={handleUserClick}
                 onMessageClick={handleMessageClick}
               />
             ) : (
               <div
-                key={friend.id}
+                key={friend.userId}
                 className="p-4 rounded-xl border transition-all duration-200 hover:shadow-md"
                 style={{
                   backgroundColor: "var(--card-bg)",
@@ -203,9 +168,9 @@ export default function ConnectedFriends() {
                 }}
               >
                 <User
-                  id={friend.id}
+                  id={friend.userId}
                   username={friend.username}
-                  picture={friend.picture}
+                  picture={friend.imageUrl}
                   size="md"
                   onClick={handleUserClick}
                 />

@@ -85,3 +85,9 @@ export interface NotificationResponse {
   userId: string;
   isRead?: boolean;
 }
+
+export interface ConnectedFriendsResponse {
+  userId: string;
+  username: string;
+  imageUrl: string;
+}
