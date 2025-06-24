@@ -313,15 +313,15 @@ function Loading() {
             className="bg-[var(--card-bg)] rounded-2xl p-6 border border-[var(--border-color)] shadow-sm"
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="h-12 w-12 bg-[var(--accent-color)] rounded-full animate-pulse"></div>
+              <div className="h-12 w-12 bg-[var(--card-bg)] rounded-full animate-pulse"></div>
               <div className="flex-1">
-                <div className="h-4 w-24 bg-[var(--accent-color)] rounded animate-pulse mb-2"></div>
-                <div className="h-3 w-16 bg-[var(--accent-color)] rounded animate-pulse"></div>
+                <div className="h-4 w-24 bg-[var(--card-bg)] rounded animate-pulse mb-2"></div>
+                <div className="h-3 w-16 bg-[var(--card-bg)] rounded animate-pulse"></div>
               </div>
             </div>
             <div className="flex gap-2">
-              <div className="h-8 flex-1 bg-[var(--accent-color)] rounded-lg animate-pulse"></div>
-              <div className="h-8 w-8 bg-[var(--accent-color)] rounded-lg animate-pulse"></div>
+              <div className="h-8 flex-1 bg-[var(--card-bg)] rounded-lg animate-pulse"></div>
+              <div className="h-8 w-8 bg-[var(--card-bg)] rounded-lg animate-pulse"></div>
             </div>
           </div>
         ))}
