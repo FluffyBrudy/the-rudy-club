@@ -2,19 +2,21 @@
 
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api";
-import { REGISTER_ROUTE } from "@/lib/router";
-import { type FormEvent, useState } from "react";
+import { FEEDS_ROUTE, REGISTER_ROUTE } from "@/lib/router";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
 import FormInput from "@/app/components/FormComponents/FormInput";
 import FormButton from "@/app/components/FormComponents/FormButton";
 import FormAlert from "@/app/components/FormComponents/FormAlert";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const performLogin = useAppStore((state) => state.login);
+  const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,7 +36,6 @@ export default function Login() {
         localStorage.setItem("accessToken", accessToken);
         setLoginSuccess(true);
         setError(null);
-        window.location.reload();
       } else {
         setError(loginResponse.error);
         setLoginSuccess(false);
@@ -47,6 +48,14 @@ export default function Login() {
       setIsLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (!loginSuccess) return;
+    const id = setTimeout(() => {
+      router.replace(FEEDS_ROUTE);
+    }, 1000);
+    return () => clearTimeout(id);
+  }, [loginSuccess, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
