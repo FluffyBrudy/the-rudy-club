@@ -423,17 +423,14 @@ class ApiClient {
 
   public async RetriveConnectedFriends() {
     try {
-      const response = await axios.get(
-        this.endpoints.SOCIAL_ACCEPTED_REQUESTS,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(this.endpoints.SOCIAL_ACCEPTED_REQUESTS, {
+        headers: {
+          Authorization: `Bearer ${localStorage.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
       if ([200, 201].includes(response.status)) {
-        const data = response.data as {
+        const data = (await response.json()) as {
           data: ConnectedFriendsResponse[];
         };
         return { error: null, data: data.data };
