@@ -1,6 +1,7 @@
 "use client";
 
 import { useAutoLogin } from "@/app/hooks/useAutoLogin";
+import { useAppStore } from "@/app/store/appStore";
 import {
   authProtectedRoutes,
   preAuthRenderableRoutes,
@@ -22,10 +23,12 @@ export function AuthRouterGuard({
   const router = useRouter();
   const pathname = usePathname();
   const { error, loading, success } = useAutoLogin();
+  const user = useAppStore((state) => state.user);
 
   const routeType = getRouteType(pathname);
 
   useEffect(() => {
+    if (user) return;
     if (loading) return;
 
     if (success) {
@@ -35,7 +38,7 @@ export function AuthRouterGuard({
       sessionStorage.clear();
       router.replace(LOGIN_ROUTE);
     }
-  }, [loading, success, routeType, router, error]);
+  }, [loading, success, routeType, router, error, user]);
 
   if (routeType === "protected") {
     if (loading) return <div>{fallbackElement ?? null}</div>;

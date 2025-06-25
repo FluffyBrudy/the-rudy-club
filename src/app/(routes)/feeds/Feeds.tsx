@@ -13,7 +13,7 @@ export default function Feeds() {
   const router = useRouter();
   const posts = useAppStore((state) => state.posts);
   const setPosts = useAppStore((state) => state.setPosts);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(posts.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,9 +34,8 @@ export default function Feeds() {
         setLoading(false);
       }
     };
-
-    fetchPosts();
-  }, [setPosts, router]);
+    if (posts.length === 0) fetchPosts();
+  }, [setPosts, router, posts.length]);
 
   return (
     <div className="container mx-auto px-4 py-8">
