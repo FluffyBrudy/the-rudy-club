@@ -3,7 +3,7 @@
 import type React from "react";
 import { useAppStore } from "@/app/store/appStore";
 import { FindValueFromObj } from "@/app/utils/findProp";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import type {
   reactionDisplayInfo,
   ReactionResponse,
@@ -137,7 +137,7 @@ export default function ReactionPicker({
         const abortController = new AbortController();
         pendingRequestRef.current = abortController;
 
-        const response = await apiClient.createReaction(
+        const response = await apiClient.reactions.createReaction(
           reactionOnId,
           reactionOnType,
           reactionType

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Trash2, Circle, CheckCircle, X } from "lucide-react";
 import type { NotificationResponse } from "@/types/apiResponseTypes";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 
 interface NotificationBellProps {
   notifications?: NotificationResponse[];
@@ -21,7 +21,7 @@ export default function NotificationBell({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    apiClient
+    apiClient.notifications
       .fetchNotifications(pageRef.current)
       .then((res) => {
         if (res.data) {
@@ -68,7 +68,7 @@ export default function NotificationBell({
   const handleLoadMore = (next?: boolean) => () => {
     if (!next && pageRef.current === 0) return;
     const page = next ? pageRef.current + 1 : Math.min(0, pageRef.current - 1);
-    apiClient
+    apiClient.notifications
       .fetchNotifications(page)
       .then((res) => {
         if (res.data) {
@@ -80,8 +80,8 @@ export default function NotificationBell({
   };
 
   const handleToggleRead = (id: number) => {
-    apiClient
-      .toggleNotificationReadStatus(id)
+    apiClient.notifications
+      .toggleReadStatus(id)
       .then((res) => {
         if (res.data) {
           setLocalNotifications((prev) =>
@@ -97,7 +97,7 @@ export default function NotificationBell({
   };
 
   const handleClear = (id: number) => {
-    apiClient.deleteNotification([id]).then((res) => {
+    apiClient.notifications.deleteNotifications([id]).then((res) => {
       if (res.data) {
         setLocalNotifications((prev) =>
           prev.filter((notification) => notification.notificationId !== id)
@@ -107,17 +107,19 @@ export default function NotificationBell({
   };
 
   const handleClearAll = (notificationIds: number[]) => () => {
-    apiClient.deleteNotification(notificationIds).then((deleteRes) => {
-      if (deleteRes.data) setLocalNotifications([]);
-      apiClient
-        .fetchNotifications(pageRef.current + 1)
-        .then((fetchRes) => {
-          if (fetchRes.data) {
-            setLocalNotifications(fetchRes.data);
-          }
-        })
-        .catch((err) => console.error(err));
-    });
+    apiClient.notifications
+      .deleteNotifications(notificationIds)
+      .then((deleteRes) => {
+        if (deleteRes.data) setLocalNotifications([]);
+        apiClient.notifications
+          .fetchNotifications(pageRef.current + 1)
+          .then((fetchRes) => {
+            if (fetchRes.data) {
+              setLocalNotifications(fetchRes.data);
+            }
+          })
+          .catch((err) => console.error(err));
+      });
   };
 
   return (

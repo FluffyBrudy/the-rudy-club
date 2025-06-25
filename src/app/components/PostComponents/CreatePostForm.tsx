@@ -6,7 +6,7 @@ import { useState, useRef } from "react";
 import { ImageIcon, Smile, MapPin, X, Loader2 } from "lucide-react";
 import { useAppStore } from "@/app/store/appStore";
 import Image from "next/image";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 
 export default function CreatePostForm() {
   const [content, setContent] = useState("");
@@ -29,7 +29,7 @@ export default function CreatePostForm() {
         mediaContent: previewImages.length > 0 ? previewImages : undefined,
       };
 
-      const response = await apiClient.createPost(postData);
+      const response = await apiClient.posts.createPost(postData);
 
       if (response.data) {
         addPost(response.data);

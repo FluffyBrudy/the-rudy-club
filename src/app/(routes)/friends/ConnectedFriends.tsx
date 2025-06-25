@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import User from "@/app/components/ui/User";
 import UserCard from "@/app/components/ui/UserCard";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import type { ConnectedFriendsResponse } from "@/types/apiResponseTypes";
 
 export default function ConnectedFriends() {
@@ -27,7 +27,7 @@ export default function ConnectedFriends() {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const connectedFriends = await apiClient.RetriveConnectedFriends();
+        const connectedFriends = await apiClient.social.getConnectedFriends();
         if (connectedFriends.data) {
           setFriends(connectedFriends.data);
         }

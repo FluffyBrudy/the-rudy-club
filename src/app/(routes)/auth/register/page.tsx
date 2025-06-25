@@ -1,6 +1,6 @@
 "use client";
 
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import { LOGIN_ROUTE } from "@/lib/router";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
@@ -27,7 +27,7 @@ export default function Register() {
     const password = formData.get("password") as string;
 
     try {
-      const registerResponse = await apiClient.registerUser(
+      const registerResponse = await apiClient.auth.register(
         username,
         email,
         password

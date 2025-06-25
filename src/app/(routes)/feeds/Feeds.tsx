@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/app/store/appStore";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import PostCard from "@/app/components/PostComponents/PostCard";
 import CreatePostForm from "@/app/components/PostComponents/CreatePostForm";
 import FeedSidebar from "@/app/components/PostComponents/FeedSidebar";
@@ -20,7 +20,7 @@ export default function Feeds() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.fetchPosts();
+        const response = await apiClient.posts.fetchPosts();
 
         if (response.error) {
           setError(response.error);

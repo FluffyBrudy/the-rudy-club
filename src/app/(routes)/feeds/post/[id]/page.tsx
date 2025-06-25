@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import CommentSection from "@/app/components/PostComponents/CommentSection";
 import ReactionPicker from "@/app/components/ReactionComponents/ReactionPicker";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 
 export default function SinglePostPage() {
   const { id } = useParams();
@@ -29,7 +29,9 @@ export default function SinglePostPage() {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.fetchPostById(id as unknown as string);
+        const response = await apiClient.posts.fetchPostById(
+          id as unknown as string
+        );
 
         if (!response.data) {
           throw new Error(response.error);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAppStore } from "@/app/store/appStore";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 
 export function useAutoLogin() {
   const performLogin = useAppStore((state) => state.login);
@@ -15,7 +15,7 @@ export function useAutoLogin() {
   useEffect(() => {
     const attemptAutoLogin = async () => {
       try {
-        const response = await apiClient.autoLoginUser();
+        const response = await apiClient.auth.autoLogin();
 
         if (response.data) {
           performLogin(response.data);

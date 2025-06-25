@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/app/store/appStore";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import { FEEDS_ROUTE, REGISTER_ROUTE } from "@/lib/router";
 import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
@@ -28,7 +28,7 @@ export default function Login() {
     const password = formData.get("password") as string;
 
     try {
-      const loginResponse = await apiClient.loginUser(email, password);
+      const loginResponse = await apiClient.auth.login(email, password);
 
       if (loginResponse.data) {
         const { accessToken, ...other } = loginResponse.data;

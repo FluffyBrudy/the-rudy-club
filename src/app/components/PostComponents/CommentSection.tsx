@@ -15,7 +15,7 @@ import type {
   CommentReplyResponse,
 } from "@/types/apiResponseTypes";
 import { useAppStore } from "@/app/store/appStore";
-import apiClient from "@/lib/api";
+import apiClient from "@/lib/api/apiclient";
 import Image from "next/image";
 import ReactionPicker from "../ReactionComponents/ReactionPicker";
 
@@ -51,7 +51,7 @@ export default function CommentSection({
     const fetchComments = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.fetchComments(postId);
+        const response = await apiClient.comments.fetchComments(postId);
         if (response.data) {
           setComments(response.data);
         }
@@ -72,7 +72,10 @@ export default function CommentSection({
 
     setSubmitting(true);
     try {
-      const response = await apiClient.createComment(postId, newComment.trim());
+      const response = await apiClient.comments.createComment(
+        postId,
+        newComment.trim()
+      );
       if (response.data) {
         setComments((prev) => [...prev, response.data!]);
         setNewComment("");
@@ -86,7 +89,7 @@ export default function CommentSection({
 
   const fetchReplies = async (commentId: number) => {
     try {
-      const response = await apiClient.fetchReplies(commentId);
+      const response = await apiClient.comments.fetchReplies(commentId);
       if (response.data) {
         setReplies((prev) => ({
           ...prev,
@@ -119,7 +122,7 @@ export default function CommentSection({
 
     setReplySubmitting((prev) => new Set([...prev, commentId]));
     try {
-      const response = await apiClient.createReply(commentId, text);
+      const response = await apiClient.comments.createReply(commentId, text);
       if (response.data) {
         setReplies((prev) => ({
           ...prev,
