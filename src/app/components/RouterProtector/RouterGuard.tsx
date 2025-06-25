@@ -28,12 +28,15 @@ export function AuthRouterGuard({
   const routeType = getRouteType(pathname);
 
   useEffect(() => {
-    if (user) return;
     if (loading) return;
 
     if (success) {
       router.replace(FEEDS_ROUTE);
-    } else if (!success && routeType === "protected") {
+      return;
+    }
+    if (loading) return;
+
+    if (!success && routeType === "protected") {
       console.error(error);
       sessionStorage.clear();
       router.replace(LOGIN_ROUTE);
