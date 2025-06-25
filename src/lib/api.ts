@@ -198,6 +198,18 @@ class ApiClient {
     }
   }
 
+  public async fetchPostById(postId: PostResponse["postId"] | string) {
+    const response = await this.axiosInstance.get(
+      `${this.endpoints.POST_FETCH}/${postId}`
+    );
+    if (response.status === 200) {
+      const data = response.data as { data: PostResponse };
+      return { error: null, data: data.data };
+    } else {
+      return { error: "failed to fetch post", data: null };
+    }
+  }
+
   public async createPost(contents: {
     textContent?: string;
     mediaContent?: string[];

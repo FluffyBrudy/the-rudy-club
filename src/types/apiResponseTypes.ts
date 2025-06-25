@@ -74,6 +74,7 @@ export type CommentReplyResponse = {
   username: string;
   totalReaction: number;
   reactions: reactionDisplayInfo;
+  postId?: number;
 };
 
 export interface NotificationResponse {
