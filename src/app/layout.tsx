@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "./components/NavComponents/Navbar";
+import { AuthRouterGuard } from "./components/RouterProtector/RouterGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,7 @@ export default function RootLayout({
           enableSystem={false}
         >
           <Navbar />
-          {children}
+          <AuthRouterGuard>{children}</AuthRouterGuard>
         </ThemeProvider>
       </body>
     </html>

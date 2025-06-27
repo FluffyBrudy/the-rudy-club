@@ -1,15 +1,16 @@
 "use client";
 
-import { useAutoLogin } from "@/app/hooks/useAutoLogin";
 import { useAppStore } from "@/app/store/appStore";
 import {
   authProtectedRoutes,
   preAuthRenderableRoutes,
   FEEDS_ROUTE,
   LOGIN_ROUTE,
+  ROOT_ROUTE,
 } from "@/lib/router";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
+import apiClient from "@/lib/api/apiclient";
 
 interface AuthRouteGuardProps {
   children: ReactNode;
@@ -22,30 +23,110 @@ export function AuthRouterGuard({
 }: AuthRouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { error, loading, success } = useAutoLogin();
-  const user = useAppStore((state) => state.user);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const performLogin = useAppStore((state) => state.login);
+
+  const [authState, setAuthState] = useState({
+    loading: false,
+    error: null as string | null,
+    success: false,
+    hasAttempted: false,
+  });
 
   const routeType = getRouteType(pathname);
 
   useEffect(() => {
-    if (loading) return;
-
-    if (success) {
-      router.replace(FEEDS_ROUTE);
+    if (isAuthenticated) {
+      if ([LOGIN_ROUTE, ROOT_ROUTE].includes(pathname)) {
+        router.replace(FEEDS_ROUTE);
+      }
       return;
     }
-    if (loading) return;
 
-    if (!success && routeType === "protected") {
-      console.error(error);
-      sessionStorage.clear();
-      router.replace(LOGIN_ROUTE);
+    if (authState.hasAttempted || authState.loading) {
+      return;
     }
-  }, [loading, success, routeType, router, error, user]);
+
+    const attemptAutoLogin = async () => {
+      setAuthState((prev) => ({ ...prev, loading: true }));
+
+      try {
+        const response = await apiClient.auth.autoLogin();
+
+        if (response.data) {
+          performLogin(response.data);
+          setAuthState({
+            loading: false,
+            error: null,
+            success: true,
+            hasAttempted: true,
+          });
+        } else {
+          setAuthState({
+            loading: false,
+            error: response.error,
+            success: false,
+            hasAttempted: true,
+          });
+        }
+      } catch (err) {
+        setAuthState({
+          loading: false,
+          error: (err as Error).message ?? "An unexpected error occurred",
+          success: false,
+          hasAttempted: true,
+        });
+      }
+    };
+
+    attemptAutoLogin();
+  }, [
+    isAuthenticated,
+    authState.hasAttempted,
+    authState.loading,
+    performLogin,
+    pathname,
+    router,
+  ]);
+
+  useEffect(() => {
+    if (authState.hasAttempted && !authState.loading) {
+      if (authState.success || isAuthenticated) {
+        if (pathname === LOGIN_ROUTE) {
+          router.replace(FEEDS_ROUTE);
+        }
+        return;
+      }
+
+      if (!authState.success && !isAuthenticated && routeType === "protected") {
+        console.error(authState.error);
+        sessionStorage.clear();
+        router.replace(LOGIN_ROUTE);
+      }
+    }
+  }, [
+    authState.error,
+    authState.loading,
+    isAuthenticated,
+    pathname,
+    routeType,
+    authState.success,
+    authState.hasAttempted,
+    router,
+  ]);
 
   if (routeType === "protected") {
-    if (loading) return <div>{fallbackElement ?? null}</div>;
-    if (!success) return null;
+    if (isAuthenticated) {
+      return <>{children}</>;
+    }
+
+    if (authState.loading || !authState.hasAttempted) {
+      return <div>{fallbackElement ?? null}</div>;
+    }
+
+    if (!authState.success && !isAuthenticated) {
+      return null;
+    }
   }
 
   return <>{children}</>;
@@ -57,8 +138,10 @@ function getRouteType(
   if (authProtectedRoutes.some((route) => pathname.startsWith(route))) {
     return "protected";
   }
+
   if (preAuthRenderableRoutes.some((route) => pathname.startsWith(route))) {
     return "prerenderable";
   }
+
   return "public";
 }

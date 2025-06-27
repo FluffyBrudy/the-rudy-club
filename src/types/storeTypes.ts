@@ -7,6 +7,7 @@ import {
 
 export type User = Omit<LoginResponse, "accessToken">;
 export type AuthSlice = {
+  isAuthenticated: boolean;
   user: User | null;
   login: (data: User) => void;
   logout: () => void;

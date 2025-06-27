@@ -3,8 +3,9 @@ import { AuthSlice } from "@/types/storeTypes";
 import { USER_STORE } from "@/lib/router";
 
 export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
+  isAuthenticated: false,
   user: null,
-  login: (data) => set({ user: data }),
+  login: (data) => set({ user: data, isAuthenticated: true }),
   logout: () => {
     set({ user: null });
     sessionStorage.removeItem(USER_STORE);
