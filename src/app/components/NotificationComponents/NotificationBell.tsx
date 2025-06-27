@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Bell, Trash2, Circle, CheckCircle, X } from "lucide-react";
+import { Bell, Trash2, Circle, CheckCircle, X, Loader2 } from "lucide-react";
 import type { NotificationResponse } from "@/types/apiResponseTypes";
 import apiClient from "@/lib/api/apiclient";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,9 @@ export default function NotificationBell({
   const [localNotifications, setLocalNotifications] = useState<
     NotificationResponse[]
   >([]);
+  const [loadingNotificationId, setLoadingNotificationId] = useState<
+    number | null
+  >(null);
   const pageRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -70,7 +73,9 @@ export default function NotificationBell({
 
   const handleLoadMore = (next?: boolean) => () => {
     if (!next && pageRef.current === 0) return;
+
     const page = next ? pageRef.current + 1 : Math.min(0, pageRef.current - 1);
+
     apiClient.notifications
       .fetchNotifications(page)
       .then((res) => {
@@ -101,35 +106,51 @@ export default function NotificationBell({
 
   const handleInfoClick = useCallback(
     async (notification: NotificationResponse) => {
-      if (!notification.isRead) {
-        handleToggleRead(notification.notificationId);
-      }
-      console.log(notification);
-      if (notification.notificationOnType === "post") {
-        setTimeout(() => {
-          router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
-        }, 0);
-      } else if (notification.notificationOnType === "comment") {
-        const response = await apiClient.comments.fetchCommentById(
-          notification.notificationId
-        );
-        if (response.data) {
-          setTimeout(() => {
-            const notificationId = response.data.postId;
-            router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
-          }, 0);
+      setLoadingNotificationId(notification.notificationId);
+
+      try {
+        if (!notification.isRead) {
+          handleToggleRead(notification.notificationId);
         }
-      } else if (notification.notificationOnType === "reply") {
+
         console.log(notification);
-        const response = await apiClient.comments.fetchReplyById(
-          notification.notificationOnId
-        );
-        if (response.data) {
+
+        if (notification.notificationOnType === "post") {
           setTimeout(() => {
-            const notificationId = response.data.postId;
-            router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
+            router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
+            setLoadingNotificationId(null);
           }, 0);
+        } else if (notification.notificationOnType === "comment") {
+          const response = await apiClient.comments.fetchCommentById(
+            notification.notificationId
+          );
+          if (response.data) {
+            setTimeout(() => {
+              const notificationId = response.data.postId;
+              router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
+              setLoadingNotificationId(null);
+            }, 0);
+          } else {
+            setLoadingNotificationId(null);
+          }
+        } else if (notification.notificationOnType === "reply") {
+          console.log(notification);
+          const response = await apiClient.comments.fetchReplyById(
+            notification.notificationOnId
+          );
+          if (response.data) {
+            setTimeout(() => {
+              const notificationId = response.data.postId;
+              router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
+              setLoadingNotificationId(null);
+            }, 0);
+          } else {
+            setLoadingNotificationId(null);
+          }
         }
+      } catch (error) {
+        console.error(error);
+        setLoadingNotificationId(null);
       }
     },
     [handleToggleRead, router]
@@ -190,7 +211,6 @@ export default function NotificationBell({
                   </span>
                 )}
               </div>
-
               <div className="flex items-center gap-1">
                 {localNotifications.length > 0 && (
                   <button
@@ -225,6 +245,9 @@ export default function NotificationBell({
                       onToggleRead={handleToggleRead}
                       onClear={handleClear}
                       onInfoClick={handleInfoClick}
+                      isLoading={
+                        loadingNotificationId === notification.notificationId
+                      }
                     />
                   ))}
                 </div>
@@ -265,19 +288,23 @@ function NotificationItem({
   onToggleRead,
   onClear,
   onInfoClick,
+  isLoading = false,
 }: {
   notification: NotificationResponse;
   onToggleRead: (id: number) => void;
   onClear: (id: number) => void;
   onInfoClick?: (notification: NotificationResponse) => Promise<void>;
+  isLoading?: boolean;
 }) {
   const [isClearing, setIsClearing] = useState(false);
 
   const handleToggleRead = () => {
+    if (isLoading) return;
     onToggleRead(notification.notificationId);
   };
 
   const handleClear = async () => {
+    if (isLoading) return;
     setIsClearing(true);
     setTimeout(() => {
       onClear(notification.notificationId);
@@ -285,6 +312,7 @@ function NotificationItem({
   };
 
   const handleInfoClick = async () => {
+    if (isLoading) return;
     onInfoClick?.(notification);
   };
 
@@ -300,11 +328,13 @@ function NotificationItem({
             ? "bg-[var(--accent-color)]/30"
             : "bg-[var(--card-bg)]"
         }
+        ${isLoading ? "opacity-75" : ""}
       `}
     >
       <button
         onClick={handleToggleRead}
-        className="flex-shrink-0 text-[var(--primary-color)] hover:opacity-70 transition-opacity mt-0.5"
+        disabled={isLoading}
+        className="flex-shrink-0 text-[var(--primary-color)] hover:opacity-70 transition-opacity mt-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
         title={notification.isRead ? "Mark as unread" : "Mark as read"}
       >
         {notification.isRead ? (
@@ -314,20 +344,29 @@ function NotificationItem({
         )}
       </button>
 
-      <div className="cursor-pointer flex-1 min-w-0" onClick={handleInfoClick}>
-        <p
-          className={`
-            text-xs leading-relaxed
-            ${
-              notification.isRead
-                ? "text-[var(--muted-color)]"
-                : "text-[var(--text-color)] font-medium"
-            }
-          `}
-        >
-          {notification.notificationInfo}
-        </p>
-
+      <div
+        className={`cursor-pointer flex-1 min-w-0 ${
+          isLoading ? "cursor-wait" : ""
+        }`}
+        onClick={handleInfoClick}
+      >
+        <div className="flex items-start gap-2">
+          <p
+            className={`
+              text-xs leading-relaxed flex-1
+              ${
+                notification.isRead
+                  ? "text-[var(--muted-color)]"
+                  : "text-[var(--text-color)] font-medium"
+              }
+            `}
+          >
+            {notification.notificationInfo}
+          </p>
+          {isLoading && (
+            <Loader2 className="w-5 h-5 text-[var(--primary-color)] animate-spin flex-shrink-0 mt-0.5" />
+          )}
+        </div>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-[10px] text-[var(--muted-color)] capitalize">
             {notification.notificationOnType}
@@ -341,7 +380,8 @@ function NotificationItem({
 
       <button
         onClick={handleClear}
-        className="flex-shrink-0 p-0.5 text-[var(--muted-color)] hover:text-red-500 transition-colors mt-0.5"
+        disabled={isLoading}
+        className="flex-shrink-0 p-0.5 text-[var(--muted-color)] hover:text-red-500 transition-colors mt-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
         title="Clear notification"
       >
         <X className="w-3 h-3" />
