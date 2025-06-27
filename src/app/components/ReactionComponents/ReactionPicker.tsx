@@ -46,7 +46,6 @@ export default function ReactionPicker({
   reactionOnType,
 }: ReactionPickerProps) {
   const userId = useAppStore((state) => state.user)?.userId;
-
   const [displayReactions, setDisplayReactions] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [userReaction, setUserReaction] = useState<ReactionType | null>(null);
@@ -54,12 +53,20 @@ export default function ReactionPicker({
     JSON.parse(JSON.stringify(reactions)) as reactionDisplayInfo
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const breakdownRef = useRef<HTMLDivElement>(null);
   const pendingRequestRef = useRef<AbortController | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const reactionCount = mutableReactions.length;
+
+  // Detect if device supports touch
+  useEffect(() => {
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   useEffect(() => {
     const closeOnClickOutside = (e: MouseEvent) => {
@@ -73,17 +80,77 @@ export default function ReactionPicker({
         setShowBreakdown(false);
       }
     };
+
     document.addEventListener("mousedown", closeOnClickOutside);
     return () => document.removeEventListener("mousedown", closeOnClickOutside);
   }, []);
 
   useEffect(() => {
     if (!userId) return;
-
     const userReactionData = FindValueFromObj(reactions, "reactorId", userId);
     setUserReaction(userReactionData?.reactionType as ReactionType | null);
     setMutableReactions(JSON.parse(JSON.stringify(reactions)));
   }, [reactions, userId]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (isTouchDevice) return; // Don't use hover on touch devices
+
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+
+    hoverTimeoutRef.current = setTimeout(() => {
+      setDisplayReactions(true);
+      setShowBreakdown(false);
+    }, 300); // 300ms delay before showing
+  }, [isTouchDevice]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isTouchDevice) return; // Don't use hover on touch devices
+
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
+    hideTimeoutRef.current = setTimeout(() => {
+      setDisplayReactions(false);
+    }, 200);
+  }, [isTouchDevice]);
+
+  const handlePopupMouseEnter = useCallback(() => {
+    if (isTouchDevice) return;
+
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  }, [isTouchDevice]);
+
+  const handlePopupMouseLeave = useCallback(() => {
+    if (isTouchDevice) return;
+
+    hideTimeoutRef.current = setTimeout(() => {
+      setDisplayReactions(false);
+    }, 200);
+  }, [isTouchDevice]);
+
+  // Clean up timeouts
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleReactionClick = useCallback(
     async (
@@ -191,7 +258,6 @@ export default function ReactionPicker({
       } catch (error) {
         if (!pendingRequestRef.current?.signal.aborted) {
           console.error("Failed to update reaction:", error);
-
           setMutableReactions(originalReactions);
           setUserReaction(originalUserReaction);
         }
@@ -204,13 +270,16 @@ export default function ReactionPicker({
   );
 
   const handleReactionButtonClick = useCallback(() => {
-    if (reactionCount > 0) {
-      setShowBreakdown(false);
-      setDisplayReactions((prev) => !prev);
-    } else {
-      setDisplayReactions((prev) => !prev);
+    // For touch devices, use click to toggle
+    if (isTouchDevice) {
+      if (reactionCount > 0) {
+        setShowBreakdown(false);
+        setDisplayReactions((prev) => !prev);
+      } else {
+        setDisplayReactions((prev) => !prev);
+      }
     }
-  }, [reactionCount]);
+  }, [reactionCount, isTouchDevice]);
 
   const handleCountClick = useCallback(
     (e: React.MouseEvent) => {
@@ -228,6 +297,8 @@ export default function ReactionPicker({
       <div className="flex items-center">
         <button
           onClick={handleReactionButtonClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           disabled={isLoading}
           className="flex items-center gap-1 px-3 py-1 rounded-l-full hover:bg-accent-color transition-colors duration-200 disabled:opacity-50"
           style={{ backgroundColor: "transparent" }}
@@ -245,13 +316,17 @@ export default function ReactionPicker({
           <button
             onClick={handleCountClick}
             disabled={isLoading}
-            className="px-2 py-1 rounded-r-full hover:bg-accent-color transition-colors duration-200 border-l border-[var(--border-color)] disabled:opacity-50"
+            className="cursor-pointer px-2 py-1 rounded-r-full hover:bg-accent-color transition-colors duration-200 border-l border-[var(--border-color)] disabled:opacity-50"
             style={{ backgroundColor: "transparent" }}
             title="View reaction breakdown"
           >
-            <span className="text-sm font-medium text-[var(--text-color)]">
+            <span
+              className="text-sm font-medium text-[var(--text-color)]"
+              title="click to show reaction"
+            >
               {reactionCount}
             </span>
+            <span style={{ color: "var(--muted-color" }}>&nbsp;show</span>
           </button>
         ) : (
           <span className="px-2 py-1 text-sm text-[var(--muted-color)]">
@@ -266,6 +341,8 @@ export default function ReactionPicker({
           style={{
             borderColor: "var(--border-color)",
           }}
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handlePopupMouseLeave}
         >
           {Object.entries(REACTION_TYPES).map(([key, reaction]) => (
             <button
@@ -296,7 +373,6 @@ export default function ReactionPicker({
         </div>
       )}
 
-      {/* Reaction Breakdown Popup */}
       {showBreakdown && reactionCount > 0 && (
         <div ref={breakdownRef}>
           <ReactionBreakdown
