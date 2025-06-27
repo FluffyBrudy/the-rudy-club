@@ -136,7 +136,7 @@ export class CommentService {
   ): Promise<TAPIResponse<MakeRequiredField<CommentReplyResponse, "postId">>> {
     try {
       const response = await this.axiosInstance.get(
-        `${API_ENDPOINTS.COMMENT.FETCH}/${commentReplyId}`
+        `${API_ENDPOINTS.COMMENT.REPLY.FETCH}/${commentReplyId}`
       );
 
       if (response.status === 200) {

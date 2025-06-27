@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
     if (!token) throw new Error("no token provided");
 
     const body = await request.json();
+    console.log(body);
     const response = await fetch(
       `${process.env.MAIN_API_URL}/notification/delete`,
       {

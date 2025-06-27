@@ -109,6 +109,27 @@ export default function NotificationBell({
         setTimeout(() => {
           router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
         }, 0);
+      } else if (notification.notificationOnType === "comment") {
+        const response = await apiClient.comments.fetchCommentById(
+          notification.notificationId
+        );
+        if (response.data) {
+          setTimeout(() => {
+            const notificationId = response.data.postId;
+            router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
+          }, 0);
+        }
+      } else if (notification.notificationOnType === "reply") {
+        console.log(notification);
+        const response = await apiClient.comments.fetchReplyById(
+          notification.notificationOnId
+        );
+        if (response.data) {
+          setTimeout(() => {
+            const notificationId = response.data.postId;
+            router.push(`${FEEDS_ROUTE}/post/${notificationId}`);
+          }, 0);
+        }
       }
     },
     [handleToggleRead, router]
