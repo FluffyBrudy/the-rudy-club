@@ -5,6 +5,7 @@ import type {
   CommentResponse,
   CommentReplyResponse,
 } from "@/types/apiResponseTypes";
+import { MakeRequiredField } from "@/types/genericTypes";
 
 export class CommentService {
   constructor(private axiosInstance: AxiosInstance) {}
@@ -105,6 +106,50 @@ export class CommentService {
     } catch (error) {
       const e = error as ErrorResponse;
       const errMsg = e.data?.error || e.statusText || "failed to create reply";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  async fetchCommentById(
+    commentId: CommentResponse["commentId"] | string
+  ): Promise<TAPIResponse<CommentResponse>> {
+    try {
+      const response = await this.axiosInstance.get(
+        `${API_ENDPOINTS.COMMENT.FETCH}/${commentId}`
+      );
+
+      if (response.status === 200) {
+        const data = response.data as { data: CommentResponse };
+        return { error: null, data: data.data };
+      }
+
+      return { error: "failed to fetch post", data: null };
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data?.error || e.statusText || "failed to fetch post";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  async fetchReplyById(
+    commentReplyId: CommentReplyResponse["commentReplyId"] | string
+  ): Promise<TAPIResponse<MakeRequiredField<CommentReplyResponse, "postId">>> {
+    try {
+      const response = await this.axiosInstance.get(
+        `${API_ENDPOINTS.COMMENT.FETCH}/${commentReplyId}`
+      );
+
+      if (response.status === 200) {
+        const data = response.data as {
+          data: MakeRequiredField<CommentReplyResponse, "postId">;
+        };
+        return { error: null, data: data.data };
+      }
+
+      return { error: "failed to fetch post", data: null };
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data?.error || e.statusText || "failed to fetch post";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }

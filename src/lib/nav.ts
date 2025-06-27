@@ -1,5 +1,6 @@
 import {
   CONNECTED_FRIENDS_ROUTE,
+  FEEDS_ROUTE,
   LOGIN_ROUTE,
   REGISTER_ROUTE,
   ROOT_ROUTE,
@@ -26,9 +27,20 @@ export type NavItem = {
 export const navItems: Array<NavItem> = [
   {
     id: "home",
-    name: "home",
+    name: "homepage",
     type: "link",
     href: ROOT_ROUTE,
+    icon: "Home",
+    postAuthVisibility: false,
+    preAuthVisibility: true,
+    order: 1,
+    section: "main",
+  },
+  {
+    id: "feeds",
+    name: "feeds",
+    type: "link",
+    href: FEEDS_ROUTE,
     icon: "Home",
     postAuthVisibility: true,
     preAuthVisibility: false,

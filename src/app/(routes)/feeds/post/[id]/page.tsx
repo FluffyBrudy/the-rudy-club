@@ -85,7 +85,7 @@ export default function SinglePostPage() {
         </div>
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
         >
           <ArrowLeft size={16} />
           Go Back
@@ -100,7 +100,7 @@ export default function SinglePostPage() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <ArrowLeft size={20} />
             <span>Back</span>

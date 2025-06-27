@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Bell, Trash2, Circle, CheckCircle, X } from "lucide-react";
 import type { NotificationResponse } from "@/types/apiResponseTypes";
 import apiClient from "@/lib/api/apiclient";
+import { useRouter } from "next/navigation";
+import { FEEDS_ROUTE } from "@/lib/router";
 
 interface NotificationBellProps {
   notifications?: NotificationResponse[];
@@ -19,6 +21,7 @@ export default function NotificationBell({
   >([]);
   const pageRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     apiClient.notifications
@@ -79,7 +82,7 @@ export default function NotificationBell({
       .catch((err) => console.error(err));
   };
 
-  const handleToggleRead = (id: number) => {
+  const handleToggleRead = useCallback((id: number) => {
     apiClient.notifications
       .toggleReadStatus(id)
       .then((res) => {
@@ -94,7 +97,22 @@ export default function NotificationBell({
         }
       })
       .catch((err) => console.error(err));
-  };
+  }, []);
+
+  const handleInfoClick = useCallback(
+    async (notification: NotificationResponse) => {
+      if (!notification.isRead) {
+        handleToggleRead(notification.notificationId);
+      }
+      console.log(notification);
+      if (notification.notificationOnType === "post") {
+        setTimeout(() => {
+          router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
+        }, 0);
+      }
+    },
+    [handleToggleRead, router]
+  );
 
   const handleClear = (id: number) => {
     apiClient.notifications.deleteNotifications([id]).then((res) => {
@@ -185,6 +203,7 @@ export default function NotificationBell({
                       notification={notification}
                       onToggleRead={handleToggleRead}
                       onClear={handleClear}
+                      onInfoClick={handleInfoClick}
                     />
                   ))}
                 </div>
@@ -224,10 +243,12 @@ function NotificationItem({
   notification,
   onToggleRead,
   onClear,
+  onInfoClick,
 }: {
   notification: NotificationResponse;
   onToggleRead: (id: number) => void;
   onClear: (id: number) => void;
+  onInfoClick?: (notification: NotificationResponse) => Promise<void>;
 }) {
   const [isClearing, setIsClearing] = useState(false);
 
@@ -240,6 +261,10 @@ function NotificationItem({
     setTimeout(() => {
       onClear(notification.notificationId);
     }, 200);
+  };
+
+  const handleInfoClick = async () => {
+    onInfoClick?.(notification);
   };
 
   return (
@@ -268,7 +293,7 @@ function NotificationItem({
         )}
       </button>
 
-      <div className="flex-1 min-w-0">
+      <div className="cursor-pointer flex-1 min-w-0" onClick={handleInfoClick}>
         <p
           className={`
             text-xs leading-relaxed
