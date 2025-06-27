@@ -3,6 +3,7 @@
 :root {
   --bg-color: white;
   --text-color: black;
+
   --primary-color: #10b981;
   --secondary-color: #6b7280;
   --accent-color: #f3f4f6;
@@ -11,11 +12,18 @@
   --card-bg: white;
   --input-bg: white;
   --input-border: #d1d5db;
+
+  --btn-bg-color: var(--primary-color);
+  --btn-text-color: white;
+  --btn-border-color: var(--primary-color);
+  --btn-hover-bg-color: #0f766e;
+  --btn-hover-text-color: white;
 }
 
 [data-theme="dark"] {
   --bg-color: #0f172a;
   --text-color: white;
+
   --primary-color: #10b981;
   --secondary-color: #94a3b8;
   --accent-color: #1e293b;
@@ -24,11 +32,18 @@
   --card-bg: #1e293b;
   --input-bg: #1e293b;
   --input-border: #475569;
+
+  --btn-bg-color: var(--primary-color);
+  --btn-text-color: white;
+  --btn-border-color: var(--primary-color);
+  --btn-hover-bg-color: #0d6d5d;
+  --btn-hover-text-color: white;
 }
 
 [data-theme="dracula"] {
   --bg-color: #282a36;
   --text-color: #f8f8f2;
+
   --primary-color: #bd93f9;
   --secondary-color: #6272a4;
   --accent-color: #44475a;
@@ -37,11 +52,18 @@
   --card-bg: #44475a;
   --input-bg: #44475a;
   --input-border: #6272a4;
+
+  --btn-bg-color: var(--primary-color);
+  --btn-text-color: #282a36;
+  --btn-border-color: var(--primary-color);
+  --btn-hover-bg-color: #9a7de0;
+  --btn-hover-text-color: #f8f8f2;
 }
 
 [data-theme="ocean"] {
   --bg-color: #0f1419;
   --text-color: #e6e1cf;
+
   --primary-color: #39bae6;
   --secondary-color: #5c6773;
   --accent-color: #1f2430;
@@ -50,11 +72,18 @@
   --card-bg: #1f2430;
   --input-bg: #1f2430;
   --input-border: #2d3748;
+
+  --btn-bg-color: var(--primary-color);
+  --btn-text-color: #0f1419;
+  --btn-border-color: var(--primary-color);
+  --btn-hover-bg-color: #2b95d6;
+  --btn-hover-text-color: #e6e1cf;
 }
 
 [data-theme="forest"] {
   --bg-color: #1a2332;
   --text-color: #d4d4aa;
+
   --primary-color: #7aa874;
   --secondary-color: #5a6c57;
   --accent-color: #2d3748;
@@ -63,6 +92,16 @@
   --card-bg: #2d3748;
   --input-bg: #2d3748;
   --input-border: #4a5568;
+
+  --btn-bg-color: var(--primary-color);
+  --btn-text-color: #1a2332;
+  --btn-border-color: var(--primary-color);
+  --btn-hover-bg-color: #5e8c5e;
+  --btn-hover-text-color: #d4d4aa;
+}
+
+@theme {
+  --primary-color: rgb(var(--primary) / <alpha-value>);
 }
 
 body {
@@ -81,4 +120,22 @@ input {
 .generic-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
+}
+
+.theme-button {
+  background-color: var(--btn-bg-color);
+  color: var(--btn-text-color);
+  border: 1px solid var(--btn-border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-button:hover {
+  background-color: var(--btn-hover-bg-color);
+  color: var(--btn-hover-text-color);
 }

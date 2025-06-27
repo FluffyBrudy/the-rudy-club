@@ -85,7 +85,7 @@ export default function SinglePostPage() {
         </div>
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg transition-colors cursor-pointer"
         >
           <ArrowLeft size={16} />
           Go Back
@@ -100,7 +100,7 @@ export default function SinglePostPage() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="theme-button flex items-center gap-2  transition-colors cursor-pointer"
           >
             <ArrowLeft size={20} />
             <span>Back</span>
@@ -155,7 +155,7 @@ export default function SinglePostPage() {
                   <div className="relative">
                     <button
                       onClick={() => setShowOptions(!showOptions)}
-                      className="p-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
+                      className="p-2 rounded-full  transition-colors duration-200"
                     >
                       <MoreHorizontal
                         size={20}
@@ -172,13 +172,13 @@ export default function SinglePostPage() {
                         }}
                       >
                         <button
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-accent/50 transition-colors duration-200"
+                          className="w-full text-left px-4 py-2 text-sm  transition-colors duration-200"
                           onClick={() => setShowOptions(false)}
                         >
                           Report post
                         </button>
                         <button
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-accent/50 transition-colors duration-200"
+                          className="w-full text-left px-4 py-2 text-sm transition-colors duration-200"
                           onClick={() => setShowOptions(false)}
                         >
                           Hide post
@@ -228,17 +228,17 @@ export default function SinglePostPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setShowComments(!showComments)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
+                      className="flex items-center gap-2 px-3 py-2 rounded-full  transition-colors duration-200"
                     >
                       <MessageCircle size={20} />
                       <span className="text-sm">Comments</span>
                     </button>
 
-                    <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                    <button className="flex items-center gap-1 p-2 rounded-full  transition-colors duration-200">
                       <Repeat2 size={20} />
                     </button>
 
-                    <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                    <button className="flex items-center gap-1 p-2 rounded-full  transition-colors duration-200">
                       <Share2 size={20} />
                     </button>
                   </div>
