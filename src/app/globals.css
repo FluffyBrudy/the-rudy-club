@@ -100,10 +100,6 @@
   --btn-hover-text-color: #d4d4aa;
 }
 
-@theme {
-  --primary-color: rgb(var(--primary) / <alpha-value>);
-}
-
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: var(--bg-color);

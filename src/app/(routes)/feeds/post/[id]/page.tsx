@@ -95,8 +95,8 @@ export default function SinglePostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
+    <div className="min-h-screen">
+      <div className="sticky top-0 z-10 backdrop-blur-sm border-b">
         <div className="max-w-2xl mx-auto px-4 py-3">
           <button
             onClick={() => router.back()}
@@ -228,17 +228,17 @@ export default function SinglePostPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setShowComments(!showComments)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-full  transition-colors duration-200"
+                      className="flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-200"
                     >
                       <MessageCircle size={20} />
                       <span className="text-sm">Comments</span>
                     </button>
 
-                    <button className="flex items-center gap-1 p-2 rounded-full  transition-colors duration-200">
+                    <button className="flex items-center gap-1 p-2 rounded-full transition-colors duration-200">
                       <Repeat2 size={20} />
                     </button>
 
-                    <button className="flex items-center gap-1 p-2 rounded-full  transition-colors duration-200">
+                    <button className="flex items-center gap-1 p-2 rounded-full transition-colors duration-200">
                       <Share2 size={20} />
                     </button>
                   </div>
