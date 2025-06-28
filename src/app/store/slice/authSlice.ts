@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand";
 import { AuthSlice } from "@/types/storeTypes";
-import { USER_STORE } from "@/lib/router";
+import { USER_STORE } from "@/lib/navigation/router";
 
 export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
   isAuthenticated: false,

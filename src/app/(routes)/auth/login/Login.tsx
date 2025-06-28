@@ -2,7 +2,7 @@
 
 import { useAppStore } from "@/app/store/appStore";
 import apiClient from "@/lib/api/apiclient";
-import { FEEDS_ROUTE, REGISTER_ROUTE } from "@/lib/router";
+import { FEEDS_ROUTE, REGISTER_ROUTE } from "@/lib/navigation/router";
 import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { LogIn } from "lucide-react";

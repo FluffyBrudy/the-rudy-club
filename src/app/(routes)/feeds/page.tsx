@@ -1,7 +1,7 @@
 import Feeds from "./Feeds";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { LOGIN_ROUTE } from "@/lib/router";
+import { LOGIN_ROUTE } from "@/lib/navigation/router";
 
 export default async function Page() {
   const cookieStore = await cookies();

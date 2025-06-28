@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { navItems } from "@/lib/nav";
-import { getIcon } from "@/lib/navIcons";
+import { navItems } from "@/lib/navigation/nav";
+import { getIcon } from "@/lib/navigation/navIcons";
 import { useAppStore } from "@/app/store/appStore";
-import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/router";
+import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/navigation/router";
 import ThemeSwitcher from "@/app/components/ui/ThemeSwitcher";
 import NotificationBell from "@/app/components/NotificationComponents/NotificationBell";
-import type { NavActionHandler } from "@/lib/navActions";
+import type { NavActionHandler } from "@/lib/navigation/navActions";
 
 interface DesktopNavProps {
   onSearchOpen: () => void;

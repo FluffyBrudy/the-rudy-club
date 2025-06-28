@@ -7,7 +7,7 @@ import {
   FEEDS_ROUTE,
   LOGIN_ROUTE,
   ROOT_ROUTE,
-} from "@/lib/router";
+} from "@/lib/navigation/router";
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import apiClient from "@/lib/api/apiclient";

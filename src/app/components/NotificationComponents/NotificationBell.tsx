@@ -5,7 +5,7 @@ import { Bell, Trash2, Circle, CheckCircle, X, Loader2 } from "lucide-react";
 import type { NotificationResponse } from "@/types/apiResponseTypes";
 import apiClient from "@/lib/api/apiclient";
 import { useRouter } from "next/navigation";
-import { FEEDS_ROUTE } from "@/lib/router";
+import { FEEDS_ROUTE } from "@/lib/navigation/router";
 
 interface NotificationBellProps {
   notifications?: NotificationResponse[];
