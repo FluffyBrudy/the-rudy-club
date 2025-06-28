@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Waves, Trees, Ghost } from "lucide-react";
+import { Sun, Moon, Waves, Trees, Ghost, Sparkle, Gem } from "lucide-react";
 
 const themes = [
   { name: "light", label: "Light", icon: Sun },
@@ -10,6 +10,8 @@ const themes = [
   { name: "dracula", label: "Dracula", icon: Ghost },
   { name: "ocean", label: "Ocean", icon: Waves },
   { name: "forest", label: "Forest", icon: Trees },
+  { name: "neon", label: "Neon", icon: Sparkle },
+  { name: "purple", label: "purple", icon: Gem },
 ];
 
 export default function ThemeSwitcher() {

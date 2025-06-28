@@ -2,49 +2,49 @@
 
 :root {
   --bg-color: white;
-  --text-color: black;
+  --text-color: #111827;
 
   --primary-color: #10b981;
   --secondary-color: #6b7280;
   --accent-color: #f3f4f6;
   --border-color: #e5e7eb;
   --muted-color: #9ca3af;
-  --card-bg: white;
-  --input-bg: white;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
   --input-border: #d1d5db;
 
-  --btn-bg-color: var(--primary-color);
-  --btn-text-color: white;
-  --btn-border-color: var(--primary-color);
-  --btn-hover-bg-color: #0f766e;
-  --btn-hover-text-color: white;
+  --btn-bg-color: #10b981;
+  --btn-text-color: #ffffff;
+  --btn-border-color: #10b981;
+  --btn-hover-bg-color: #059669;
+  --btn-hover-text-color: #ffffff;
 }
 
 [data-theme="dark"] {
   --bg-color: #0f172a;
-  --text-color: white;
+  --text-color: #f1f5f9;
 
-  --primary-color: #10b981;
-  --secondary-color: #94a3b8;
+  --primary-color: #0ea5e9;
+  --secondary-color: #64748b;
   --accent-color: #1e293b;
   --border-color: #334155;
-  --muted-color: #64748b;
+  --muted-color: #475569;
   --card-bg: #1e293b;
   --input-bg: #1e293b;
   --input-border: #475569;
 
-  --btn-bg-color: var(--primary-color);
-  --btn-text-color: white;
-  --btn-border-color: var(--primary-color);
-  --btn-hover-bg-color: #0d6d5d;
-  --btn-hover-text-color: white;
+  --btn-bg-color: #0ea5e9;
+  --btn-text-color: #ffffff;
+  --btn-border-color: #0ea5e9;
+  --btn-hover-bg-color: #0284c7;
+  --btn-hover-text-color: #ffffff;
 }
 
 [data-theme="dracula"] {
   --bg-color: #282a36;
   --text-color: #f8f8f2;
 
-  --primary-color: #bd93f9;
+  --primary-color: #ff79c6;
   --secondary-color: #6272a4;
   --accent-color: #44475a;
   --border-color: #6272a4;
@@ -53,11 +53,11 @@
   --input-bg: #44475a;
   --input-border: #6272a4;
 
-  --btn-bg-color: var(--primary-color);
+  --btn-bg-color: #ff79c6;
   --btn-text-color: #282a36;
-  --btn-border-color: var(--primary-color);
-  --btn-hover-bg-color: #9a7de0;
-  --btn-hover-text-color: #f8f8f2;
+  --btn-border-color: #ff79c6;
+  --btn-hover-bg-color: #ff92df;
+  --btn-hover-text-color: #1e1f29;
 }
 
 [data-theme="ocean"] {
@@ -73,31 +73,73 @@
   --input-bg: #1f2430;
   --input-border: #2d3748;
 
-  --btn-bg-color: var(--primary-color);
+  --btn-bg-color: #39bae6;
   --btn-text-color: #0f1419;
-  --btn-border-color: var(--primary-color);
-  --btn-hover-bg-color: #2b95d6;
-  --btn-hover-text-color: #e6e1cf;
+  --btn-border-color: #39bae6;
+  --btn-hover-bg-color: #4ecdf3;
+  --btn-hover-text-color: #ffffff;
 }
 
 [data-theme="forest"] {
   --bg-color: #1a2332;
-  --text-color: #d4d4aa;
+  --text-color: #e2f0d9;
 
   --primary-color: #7aa874;
   --secondary-color: #5a6c57;
   --accent-color: #2d3748;
   --border-color: #4a5568;
-  --muted-color: #718096;
+  --muted-color: #8c9e8a;
   --card-bg: #2d3748;
   --input-bg: #2d3748;
   --input-border: #4a5568;
 
-  --btn-bg-color: var(--primary-color);
+  --btn-bg-color: #7aa874;
   --btn-text-color: #1a2332;
-  --btn-border-color: var(--primary-color);
-  --btn-hover-bg-color: #5e8c5e;
-  --btn-hover-text-color: #d4d4aa;
+  --btn-border-color: #7aa874;
+  --btn-hover-bg-color: #95c38b;
+  --btn-hover-text-color: #0e141d;
+}
+
+[data-theme="neon"] {
+  --bg-color: #0d0c1d;
+  --text-color: #e0e0ff;
+
+  --primary-color: #ff6ec7;
+  --secondary-color: #c084fc;
+  --accent-color: #191724;
+  --border-color: #5a189a;
+  --muted-color: #9d4edd;
+  --card-bg: #1c1b2a;
+  --input-bg: #1c1b2a;
+  --input-border: #5a189a;
+
+  --btn-bg-color: #ff6ec7;
+  --btn-text-color: #0d0c1d;
+  --btn-border-color: #ff6ec7;
+  --btn-hover-bg-color: #ff94d9;
+  --btn-hover-text-color: #0d0c1d;
+}
+
+[data-theme="purple"] {
+  --bg-color: #1e1b4b;
+  --text-color: #faf5ff;
+
+  --primary-color: #a855f7;
+  --secondary-color: #6b21a8;
+  --accent-color: #2e1065;
+  --border-color: #6b21a8;
+  --muted-color: #f3e8ff;
+  --card-bg: #2e1065;
+  --input-bg: #2e1065;
+  --input-border: #6b21a8;
+
+  --btn-bg-color: #a855f7;
+  --btn-text-color: #fff;
+  --btn-border-color: #a855f7;
+  --btn-hover-bg-color: #9333ea;
+  --btn-hover-text-color: #fff;
+
+  /* --box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.4); */
 }
 
 body {
