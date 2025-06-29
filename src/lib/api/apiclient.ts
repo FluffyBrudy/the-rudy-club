@@ -1,4 +1,3 @@
-// lib/api/client.ts - Main API Client
 import axios, { AxiosInstance } from "axios";
 import { getPigeonEndpoints } from "./config";
 import {

@@ -38,6 +38,7 @@ export const getPigeonEndpoints = (baseUrl: string) => ({
     ACCEPTED_REQUESTS: `${baseUrl}/api/social/friends/requests/accepted`,
     ACCEPT_REQUEST: `${baseUrl}/api/social/friends/requests/accept`,
     REJECT_REQUEST: `${baseUrl}/api/social/friends/requests/reject`,
+    FRIENDS_SUGGESTION: `${baseUrl}/api/social/friends/suggestion`,
   },
 
   CHAT: {

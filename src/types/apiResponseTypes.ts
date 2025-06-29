@@ -92,3 +92,11 @@ export interface ConnectedFriendsResponse {
   username: string;
   imageUrl: string;
 }
+
+export type PendingFriendRequests = ConnectedFriendsResponse;
+
+export interface SuggestedFriendsResponse {
+  suggestedUser: string; // todo: rename later in backed to id
+  username: string;
+  imageUrl: string;
+}
