@@ -5,10 +5,17 @@ import SearchModal from "@/app/components/ui/SearchModel";
 import Logo from "@/app/components/NavComponents/Logo";
 import DesktopNav from "@/app/components/NavComponents/DesktopNav";
 import MobileNav from "@/app/components/NavComponents/MobileNav";
+import { useAppStore } from "@/app/store/appStore";
+import { useRouter } from "next/navigation";
+import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/navigation/router";
+import type { NavActionHandler } from "@/lib/navigation/navActions";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const user = useAppStore((state) => state.user);
+  const logout = useAppStore((state) => state.logout);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -27,10 +34,26 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const handleOpenSearch = () => setSearchOpen(true);
+  const handleOpenProfile = () => {
+    if (user) {
+      router.push(`/profile/${user.username}`);
+    }
+  };
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
+
+  const actions: NavActionHandler = {
+    openSearch: handleOpenSearch,
+    openProfile: handleOpenProfile,
+    logout: handleLogout,
+  };
+
   return (
     <>
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
@@ -45,14 +68,11 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Logo />
-
-            <DesktopNav onSearchOpen={() => setSearchOpen(true)} />
-
-            <MobileNav onSearchOpen={() => setSearchOpen(true)} />
+            <DesktopNav actions={actions} />
+            <MobileNav actions={actions} />
           </div>
         </div>
       </nav>
-
       <div className="h-16"></div>
     </>
   );

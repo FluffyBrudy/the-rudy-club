@@ -30,4 +30,25 @@ export type ReplySlice = {
   setReplies: (replies: CommentReplyResponse[]) => void;
 };
 
-export type AppState = AuthSlice & PostSlice & CommentSlice & ReplySlice;
+export type Notification = {
+  notificationId: number;
+  notificationInfo: string;
+  isRead: boolean;
+  notificationOnType: string;
+  notificationOnId: number;
+  createdAt: string;
+};
+
+export type NotificationSlice = {
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
+  addNotification: (notification: Notification) => void;
+  removeNotification: (id: number) => void;
+  markAsRead: (id: number) => void;
+};
+
+export type AppState = AuthSlice &
+  PostSlice &
+  CommentSlice &
+  ReplySlice &
+  NotificationSlice;

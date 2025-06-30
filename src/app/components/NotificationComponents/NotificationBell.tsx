@@ -3,9 +3,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Bell, Trash2, Circle, CheckCircle, X, Loader2 } from "lucide-react";
 import type { NotificationResponse } from "@/types/apiResponseTypes";
+import type { Notification } from "@/types/storeTypes";
 import apiClient from "@/lib/api/apiclient";
 import { useRouter } from "next/navigation";
 import { FEEDS_ROUTE } from "@/lib/navigation/router";
+import { useAppStore } from "@/app/store/appStore";
 
 interface NotificationBellProps {
   notifications?: NotificationResponse[];
@@ -16,9 +18,6 @@ export default function NotificationBell({
   className = "",
 }: NotificationBellProps) {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [localNotifications, setLocalNotifications] = useState<
-    NotificationResponse[]
-  >([]);
   const [loadingNotificationId, setLoadingNotificationId] = useState<
     number | null
   >(null);
@@ -26,17 +25,22 @@ export default function NotificationBell({
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const notifications = useAppStore((state) => state.notifications);
+  const setNotifications = useAppStore((state) => state.setNotifications);
+  // const addNotification = useAppStore((state) => state.addNotification); //will use later when socket added
+  const removeNotification = useAppStore((state) => state.removeNotification);
+  const markAsRead = useAppStore((state) => state.markAsRead);
+
   useEffect(() => {
     apiClient.notifications
       .fetchNotifications(pageRef.current)
       .then((res) => {
         if (res.data) {
-          setLocalNotifications(res.data);
-          console.log(res.data);
+          setNotifications(res.data.map(mapApiNotification));
         }
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [setNotifications]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -65,7 +69,7 @@ export default function NotificationBell({
     };
   }, [showNotifications]);
 
-  const unreadCount = localNotifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
@@ -73,48 +77,39 @@ export default function NotificationBell({
 
   const handleLoadMore = (next?: boolean) => () => {
     if (!next && pageRef.current === 0) return;
-
     const page = next ? pageRef.current + 1 : Math.min(0, pageRef.current - 1);
-
     apiClient.notifications
       .fetchNotifications(page)
       .then((res) => {
         if (res.data) {
-          setLocalNotifications(res.data);
+          setNotifications(res.data.map(mapApiNotification));
           pageRef.current = page;
         }
       })
       .catch((err) => console.error(err));
   };
 
-  const handleToggleRead = useCallback((id: number) => {
-    apiClient.notifications
-      .toggleReadStatus(id)
-      .then((res) => {
-        if (res.data) {
-          setLocalNotifications((prev) =>
-            prev.map((notification) =>
-              notification.notificationId === id
-                ? { ...notification, isRead: !notification.isRead }
-                : notification
-            )
-          );
-        }
-      })
-      .catch((err) => console.error(err));
-  }, []);
+  const handleToggleRead = useCallback(
+    (id: number) => {
+      apiClient.notifications
+        .toggleReadStatus(id)
+        .then((res) => {
+          if (res.data) {
+            markAsRead(id);
+          }
+        })
+        .catch((err) => console.error(err));
+    },
+    [markAsRead]
+  );
 
   const handleInfoClick = useCallback(
-    async (notification: NotificationResponse) => {
+    async (notification: Notification) => {
       setLoadingNotificationId(notification.notificationId);
-
       try {
         if (!notification.isRead) {
           handleToggleRead(notification.notificationId);
         }
-
-        console.log(notification);
-
         if (notification.notificationOnType === "post") {
           setTimeout(() => {
             router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
@@ -134,7 +129,6 @@ export default function NotificationBell({
             setLoadingNotificationId(null);
           }
         } else if (notification.notificationOnType === "reply") {
-          console.log(notification);
           const response = await apiClient.comments.fetchReplyById(
             notification.notificationOnId
           );
@@ -159,9 +153,7 @@ export default function NotificationBell({
   const handleClear = (id: number) => {
     apiClient.notifications.deleteNotifications([id]).then((res) => {
       if (res.data) {
-        setLocalNotifications((prev) =>
-          prev.filter((notification) => notification.notificationId !== id)
-        );
+        removeNotification(id);
       }
     });
   };
@@ -170,12 +162,12 @@ export default function NotificationBell({
     apiClient.notifications
       .deleteNotifications(notificationIds)
       .then((deleteRes) => {
-        if (deleteRes.data) setLocalNotifications([]);
+        if (deleteRes.data) setNotifications([]);
         apiClient.notifications
           .fetchNotifications(pageRef.current + 1)
           .then((fetchRes) => {
             if (fetchRes.data) {
-              setLocalNotifications(fetchRes.data);
+              setNotifications(fetchRes.data.map(mapApiNotification));
             }
           })
           .catch((err) => console.error(err));
@@ -212,12 +204,10 @@ export default function NotificationBell({
                 )}
               </div>
               <div className="flex items-center gap-1">
-                {localNotifications.length > 0 && (
+                {notifications.length > 0 && (
                   <button
                     onClick={handleClearAll(
-                      localNotifications.map(
-                        ({ notificationId }) => notificationId
-                      )
+                      notifications.map(({ notificationId }) => notificationId)
                     )}
                     className="p-1 text-[var(--muted-color)] hover:text-red-500 transition-colors ml-1"
                     title="Clear all"
@@ -229,7 +219,7 @@ export default function NotificationBell({
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-              {localNotifications.length === 0 ? (
+              {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
                   <Bell className="w-6 h-6 text-[var(--muted-color)] mb-2" />
                   <p className="text-xs text-[var(--muted-color)]">
@@ -238,7 +228,7 @@ export default function NotificationBell({
                 </div>
               ) : (
                 <div>
-                  {localNotifications.map((notification) => (
+                  {notifications.map((notification) => (
                     <NotificationItem
                       key={notification.notificationId}
                       notification={notification}
@@ -254,7 +244,7 @@ export default function NotificationBell({
               )}
             </div>
 
-            {localNotifications.length > 0 ? (
+            {notifications.length > 0 ? (
               <div className="p-2 border-t border-[var(--border-color)] text-center">
                 <button
                   onClick={handleLoadMore(true)}
@@ -264,7 +254,7 @@ export default function NotificationBell({
                 </button>
               </div>
             ) : (
-              localNotifications.length < 10 &&
+              notifications.length < 10 &&
               pageRef.current !== 0 && (
                 <div className="p-2 border-t border-[var(--border-color)] text-center">
                   <button
@@ -283,6 +273,17 @@ export default function NotificationBell({
   );
 }
 
+function mapApiNotification(n: NotificationResponse): Notification {
+  return {
+    notificationId: n.notificationId,
+    notificationInfo: n.notificationInfo,
+    isRead: n.isRead ?? false,
+    notificationOnType: n.notificationOnType,
+    notificationOnId: n.notificationOnId,
+    createdAt: n.createdAt,
+  };
+}
+
 function NotificationItem({
   notification,
   onToggleRead,
@@ -290,10 +291,10 @@ function NotificationItem({
   onInfoClick,
   isLoading = false,
 }: {
-  notification: NotificationResponse;
+  notification: Notification;
   onToggleRead: (id: number) => void;
   onClear: (id: number) => void;
-  onInfoClick?: (notification: NotificationResponse) => Promise<void>;
+  onInfoClick?: (notification: Notification) => Promise<void>;
   isLoading?: boolean;
 }) {
   const [isClearing, setIsClearing] = useState(false);

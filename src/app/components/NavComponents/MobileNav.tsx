@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { navItems } from "@/lib/navigation/nav";
 import { getIcon } from "@/lib/navigation/navIcons";
@@ -13,36 +13,16 @@ import NotificationBell from "@/app/components/NotificationComponents/Notificati
 import type { NavActionHandler } from "@/lib/navigation/navActions";
 
 interface MobileNavProps {
-  onSearchOpen: () => void;
+  actions: NavActionHandler;
 }
 
-export default function MobileNav({ onSearchOpen }: MobileNavProps) {
+export default function MobileNav({ actions }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const user = useAppStore((state) => state.user);
-  const logout = useAppStore((state) => state.logout);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
-
-  const handleLogout = () => {
-    logout();
-    closeMenu();
-    router.push("/");
-  };
-
-  const actions: NavActionHandler = {
-    openSearch: () => {
-      onSearchOpen();
-      closeMenu();
-    },
-    openProfile: () => {
-      console.log("Profile clicked");
-      closeMenu();
-    },
-    logout: handleLogout,
-  };
 
   const getFilteredItems = (section: string) => {
     return navItems
@@ -61,9 +41,7 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
     if (item.type === "link") {
       const isActive = pathname === item.href;
       const href = user && item.href === ROOT_ROUTE ? FEEDS_ROUTE : item.href!;
-
       if (user && item.href === ROOT_ROUTE) return null;
-
       return (
         <Link
           key={item.id}
@@ -87,9 +65,11 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
     }
 
     if (item.type === "button" && item.action) {
-      const actionHandler = actions[item.action as keyof NavActionHandler];
+      const actionHandler = () => {
+        actions[item.action as keyof NavActionHandler]();
+        closeMenu();
+      };
       const isLogout = item.action === "logout";
-
       return (
         <button
           key={item.id}
@@ -156,7 +136,6 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
           onClick={closeMenu}
         />
       )}
-
       <div className="flex items-center space-x-2 md:hidden">
         {topBarActions.map(renderNavItem)}
         <button
@@ -180,7 +159,6 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
               )}
         </button>
       </div>
-
       <div
         className={`fixed top-16 right-0 h-[calc(100vh-4rem)] w-80 bg-background/95 backdrop-blur-xl border-l shadow-2xl transform transition-transform duration-300 ease-out z-50 md:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
@@ -232,7 +210,6 @@ export default function MobileNav({ onSearchOpen }: MobileNavProps) {
               </div>
             </div>
           )}
-
           <div className="flex-1 overflow-y-auto py-4">
             <div className="space-y-1 px-4">
               {mainItems.map(renderNavItem)}

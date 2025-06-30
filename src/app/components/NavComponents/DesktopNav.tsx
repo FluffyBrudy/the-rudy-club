@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { navItems } from "@/lib/navigation/nav";
 import { getIcon } from "@/lib/navigation/navIcons";
 import { useAppStore } from "@/app/store/appStore";
@@ -11,27 +11,12 @@ import NotificationBell from "@/app/components/NotificationComponents/Notificati
 import type { NavActionHandler } from "@/lib/navigation/navActions";
 
 interface DesktopNavProps {
-  onSearchOpen: () => void;
+  actions: NavActionHandler;
 }
 
-export default function DesktopNav({ onSearchOpen }: DesktopNavProps) {
+export default function DesktopNav({ actions }: DesktopNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const user = useAppStore((state) => state.user);
-  const logout = useAppStore((state) => state.logout);
-
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
-
-  const actions: NavActionHandler = {
-    openSearch: onSearchOpen,
-    openProfile: () => {
-      console.log("Profile clicked");
-    },
-    logout: handleLogout,
-  };
 
   const getFilteredItems = (section: string) => {
     return navItems
@@ -118,7 +103,6 @@ export default function DesktopNav({ onSearchOpen }: DesktopNavProps) {
       <div className="hidden md:flex items-center space-x-1">
         {mainItems.map(renderNavItem)}
       </div>
-
       <div className="hidden md:flex items-center space-x-3">
         {actionItems.map(renderNavItem)}
       </div>
