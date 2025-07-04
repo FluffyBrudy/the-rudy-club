@@ -3,12 +3,14 @@ export const LOGIN_ROUTE = "/auth/login";
 export const REGISTER_ROUTE = "/auth/register";
 export const FEEDS_ROUTE = "/feeds";
 export const CONNECTED_FRIENDS_ROUTE = "/friends";
+export const USER_PROFILE = "/profile"
 
 export const USER_STORE = "user-store";
 
 export const authProtectedRoutes = Object.freeze([
   FEEDS_ROUTE,
   CONNECTED_FRIENDS_ROUTE,
+  USER_PROFILE
 ]);
 
 export const preAuthRenderableRoutes = Object.freeze([

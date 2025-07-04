@@ -8,6 +8,7 @@ import PostCard from "@/app/components/PostComponents/PostCard";
 import CreatePostForm from "@/app/components/PostComponents/CreatePostForm";
 import FeedSidebar from "@/app/components/PostComponents/FeedSidebar";
 import { Loader2 } from "lucide-react";
+import { USER_PROFILE } from "@/lib/navigation/router";
 
 export default function Feeds() {
   const router = useRouter();
@@ -15,6 +16,10 @@ export default function Feeds() {
   const setPosts = useAppStore((state) => state.setPosts);
   const [loading, setLoading] = useState(posts.length === 0);
   const [error, setError] = useState<string | null>(null);
+
+  const handleProfileClick = async (userId: string) => {
+    router.push(`${USER_PROFILE}/${userId}`);
+  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -95,7 +100,11 @@ export default function Feeds() {
           ) : (
             <div>
               {posts.map((post) => (
-                <PostCard key={post.postId} post={post} />
+                <PostCard
+                  key={post.postId}
+                  post={post}
+                  handleProfileClick={handleProfileClick}
+                />
               ))}
             </div>
           )}

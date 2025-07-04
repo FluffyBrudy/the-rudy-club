@@ -8,7 +8,7 @@ export class PostService {
   constructor(
     private axiosInstance: AxiosInstance,
     private uploadService: UploadService
-  ) {}
+  ) { }
 
   async fetchPosts(): Promise<TAPIResponse<PostResponse[]>> {
     try {
@@ -37,6 +37,25 @@ export class PostService {
 
       if (response.status === 200) {
         const data = response.data as { data: PostResponse };
+        return { error: null, data: data.data };
+      }
+
+      return { error: "failed to fetch post", data: null };
+    } catch (error) {
+      const e = error as ErrorResponse;
+      const errMsg = e.data?.error || e.statusText || "failed to fetch post";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  async fetchPostByUserId(userId: string): Promise<TAPIResponse<PostResponse[]>> {
+    try {
+      const response = await this.axiosInstance.get(
+        `${API_ENDPOINTS.POST.FETCH_USER_POST}/${userId}`
+      );
+
+      if (response.status === 200) {
+        const data = response.data as { data: PostResponse[] };
         return { error: null, data: data.data };
       }
 

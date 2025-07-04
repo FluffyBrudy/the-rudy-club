@@ -6,12 +6,15 @@ import type { PostResponse } from "@/types/apiResponseTypes";
 import Image from "next/image";
 import CommentSection from "./CommentSection";
 import ReactionPicker from "../ReactionComponents/ReactionPicker";
+import apiClient from "@/lib/api/apiclient";
+import User from "../ui/User";
 
 interface PostCardProps {
   post: PostResponse;
+  handleProfileClick?: (userId: string) => Promise<void>;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, handleProfileClick }: PostCardProps) {
   const [showOptions, setShowOptions] = useState(false);
   const [showComments, setShowComments] = useState(false);
 
@@ -28,23 +31,14 @@ export default function PostCard({ post }: PostCardProps) {
       <div className="p-5">
         <div className="flex items-start">
           <div className="flex-shrink-0 mr-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden relative">
-              {post.profilePicture ? (
-                <Image
-                  src={post.profilePicture || "/placeholder.svg"}
-                  alt={post.username}
-                  width={48}
-                  height={48}
-                  className="object-cover"
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white font-bold"
-                  style={{ backgroundColor: "var(--primary-color)" }}
-                >
-                  {post.username.charAt(0).toUpperCase()}
-                </div>
-              )}
+            <div className=" rounded-full overflow-hidden relative">
+              <User
+                onClick={handleProfileClick}
+                id={post.authorId}
+                picture={post.profilePicture}
+                username={post.username}
+                showUsername={false}
+              />
             </div>
           </div>
 

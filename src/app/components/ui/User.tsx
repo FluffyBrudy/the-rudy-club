@@ -47,7 +47,7 @@ export default function User({
       onClick={handleClick}
     >
       <div
-        className={`${sizeClasses[size]} rounded-full overflow-hidden flex-shrink-0 border-2`}
+        className={`${sizeClasses[size]} rounded-full overflow-hidden flex-shrink-0 border-0`}
         style={{ borderColor: "var(--border-color)" }}
       >
         {picture ? (

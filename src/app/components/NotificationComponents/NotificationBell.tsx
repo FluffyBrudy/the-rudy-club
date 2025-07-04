@@ -112,6 +112,7 @@ export default function NotificationBell({
         }
         if (notification.notificationOnType === "post") {
           setTimeout(() => {
+            console.log(notification.notificationId);
             router.push(`${FEEDS_ROUTE}/post/${notification.notificationOnId}`);
             setLoadingNotificationId(null);
           }, 0);
