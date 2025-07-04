@@ -13,6 +13,7 @@ import {
   TabsContent,
 } from "@/app/components/ui/TabComponents";
 import Image from "next/image";
+import MediaLightbox from "@/app/components/ui/MediaLightbox";
 
 function ProfileInfo({
   user,
@@ -50,6 +51,19 @@ function ProfileInfo({
 }
 
 function MediaGallery({ mediaContent }: { mediaContent: string[] }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openLightbox = (url: string) => {
+    setSelectedImage(url);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setSelectedImage(null);
+  };
+
   return (
     <div className="rounded-xl shadow p-4 bg-[var(--card-bg)] border border-[var(--border-color)] mb-4">
       <h3 className="font-semibold mb-2 text-[var(--text-color)]">Media</h3>
@@ -58,16 +72,31 @@ function MediaGallery({ mediaContent }: { mediaContent: string[] }) {
       ) : (
         <div className="grid grid-cols-2 gap-2">
           {mediaContent.map((url, idx) => (
-            <Image
+            <div
               key={idx}
-              src={url}
-              alt={`media-${idx}`}
-              className="w-full h-24 object-cover rounded border border-[var(--border-color)]"
-              fill
-            />
+              className="relative w-full aspect-[4/3] bg-[var(--muted-color)] rounded border border-[var(--border-color)] overflow-hidden cursor-pointer group"
+              onClick={() => openLightbox(url)}
+              tabIndex={0}
+              aria-label="Expand image"
+            >
+              <Image
+                src={url}
+                alt={`media-${idx}`}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-200"
+                sizes="(max-width: 768px) 100vw, 300px"
+              />
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
           ))}
         </div>
       )}
+      <MediaLightbox
+        open={lightboxOpen}
+        imageUrl={selectedImage || ""}
+        onClose={closeLightbox}
+        alt="Expanded media"
+      />
     </div>
   );
 }
