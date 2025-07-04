@@ -12,6 +12,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/app/components/ui/TabComponents";
+import Image from "next/image";
 
 function ProfileInfo({
   user,
@@ -26,10 +27,11 @@ function ProfileInfo({
     <div className="rounded-xl shadow p-6 mb-6 flex items-center gap-4 bg-[var(--card-bg)] border border-[var(--border-color)]">
       <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--muted-color)] flex items-center justify-center">
         {user?.profilePicture ? (
-          <img
+          <Image
             src={user.profilePicture}
             alt="Profile"
-            className="w-full h-full object-cover"
+            width={48}
+            height={48}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-3xl text-[var(--muted-color)]">
@@ -56,11 +58,12 @@ function MediaGallery({ mediaContent }: { mediaContent: string[] }) {
       ) : (
         <div className="grid grid-cols-2 gap-2">
           {mediaContent.map((url, idx) => (
-            <img
+            <Image
               key={idx}
               src={url}
               alt={`media-${idx}`}
               className="w-full h-24 object-cover rounded border border-[var(--border-color)]"
+              fill
             />
           ))}
         </div>

@@ -6,7 +6,6 @@ import type { PostResponse } from "@/types/apiResponseTypes";
 import Image from "next/image";
 import CommentSection from "./CommentSection";
 import ReactionPicker from "../ReactionComponents/ReactionPicker";
-import apiClient from "@/lib/api/apiclient";
 import User from "../ui/User";
 
 interface PostCardProps {

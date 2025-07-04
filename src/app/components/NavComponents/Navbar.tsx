@@ -7,8 +7,8 @@ import DesktopNav from "@/app/components/NavComponents/DesktopNav";
 import MobileNav from "@/app/components/NavComponents/MobileNav";
 import { useAppStore } from "@/app/store/appStore";
 import { useRouter } from "next/navigation";
-import { FEEDS_ROUTE, ROOT_ROUTE } from "@/lib/navigation/router";
 import type { NavActionHandler } from "@/lib/navigation/navActions";
+import { USER_PROFILE } from "@/lib/navigation/router";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -37,7 +37,7 @@ export default function Navbar() {
   const handleOpenSearch = () => setSearchOpen(true);
   const handleOpenProfile = () => {
     if (user) {
-      router.push(`/profile/${user.username}`);
+      router.push(`${USER_PROFILE}/${user.userId}`);
     }
   };
   const handleLogout = () => {
