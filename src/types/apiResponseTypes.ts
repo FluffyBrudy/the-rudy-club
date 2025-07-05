@@ -100,3 +100,15 @@ export interface SuggestedFriendsResponse {
   username: string;
   imageUrl: string;
 }
+
+export type SearchUsersResponse = {
+  id: string;
+  username: string;
+  picture: string;
+}
+
+export type SearchPostsResponse = {
+  postId: string;
+  matchedContent: string;
+  fullContent?: string //forgot to add in backend
+}

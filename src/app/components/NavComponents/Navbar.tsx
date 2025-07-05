@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SearchModal from "@/app/components/ui/SearchModel";
+import SearchModal from "@/app/components/searchModel/SearchModel";
 import Logo from "@/app/components/NavComponents/Logo";
 import DesktopNav from "@/app/components/NavComponents/DesktopNav";
 import MobileNav from "@/app/components/NavComponents/MobileNav";

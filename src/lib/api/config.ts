@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   POST: {
     CREATE: "/api/post/create",
     FETCH: "/api/post/fetch",
+    SEARCH: "/api/post/search",
     FETCH_USER_POST: "/api/post/fetch/user"
   },
 
