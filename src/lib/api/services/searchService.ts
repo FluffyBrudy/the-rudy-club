@@ -39,7 +39,8 @@ export class SearchService {
 
     async searchPosts<T = SearchPostsResponse>(searchTerm: string): Promise<TAPIResponse<T[]>> {
         try {
-            const response = await this.axiosInstance.get(`${API_ENDPOINTS.POST.SEARCH}?q=${searchTerm}`,)
+            const encodedSearchTerm = encodeURIComponent(searchTerm)
+            const response = await this.axiosInstance.get(`${API_ENDPOINTS.POST.SEARCH}?q=${encodedSearchTerm}`,)
 
             if ([200, 201].includes(response.status)) {
                 const data = response.data as {

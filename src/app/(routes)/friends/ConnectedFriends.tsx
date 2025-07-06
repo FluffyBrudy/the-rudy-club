@@ -15,8 +15,11 @@ import User from "@/app/components/ui/User";
 import UserCard from "@/app/components/ui/UserCard";
 import apiClient from "@/lib/api/apiclient";
 import type { ConnectedFriendsResponse } from "@/types/apiResponseTypes";
+import { useRouter } from "next/navigation";
+import { USER_PROFILE } from "@/lib/navigation/router";
 
 export default function ConnectedFriends() {
+  const router = useRouter();
   const [friends, setFriends] = useState<ConnectedFriendsResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +56,7 @@ export default function ConnectedFriends() {
   }, [friends, searchQuery, sortBy]);
 
   const handleUserClick = (userId: string) => {
-    console.log("User clicked:", userId);
+    router.push(`${USER_PROFILE}/${userId}`);
   };
 
   const handleMessageClick = (userId: string) => {

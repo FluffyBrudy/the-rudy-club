@@ -1,6 +1,6 @@
 import { SearchPostsResponse } from "@/types/apiResponseTypes";
 import React from "react";
-import { ArrowUpRight } from "lucide-react"; // Add an icon for UX hint
+import { ArrowUpRight, Info } from "lucide-react"; // Add Info icon for guide
 
 function highlightTerm(text: string, searchTerm: string) {
   if (!searchTerm) return text;
@@ -51,6 +51,34 @@ interface PostSearchResultsProps {
   onPostClick?: (postId: string) => void;
 }
 
+function LexemeGuide() {
+  return (
+    <div className="mb-6 p-4 rounded-lg bg-slate-700/60 border border-slate-600 text-sm text-slate-200 flex gap-3 items-start">
+      <Info className="w-5 h-5 mt-1 text-blue-300 flex-shrink-0" />
+      <div>
+        <div className="font-semibold mb-1 text-blue-200">
+          How to search posts
+        </div>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <span className="font-mono bg-slate-800 px-1 rounded">
+              word1 | word2
+            </span>{" "}
+            — finds posts containing <b>word1</b> <i>or</i> <b>word2</b>
+          </li>
+          <li>
+            <span className="font-mono bg-slate-800 px-1 rounded">
+              full sentence or full word
+            </span>{" "}
+            — use a full word or sentence for precise matches; use{" "}
+            <span className="font-mono">|</span> to search alternatives
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export default function PostSearchResults({
   results,
   loading,
@@ -68,6 +96,7 @@ export default function PostSearchResults({
   }
   return (
     <div className="p-6">
+      {(!searchTerm || searchTerm.trim() === "") && <LexemeGuide />}
       <div className="mb-4">
         <p className="text-sm" style={{ color: "var(--muted-color, #94a3b8)" }}>
           {results.length === 0 && !loading && !error
@@ -100,9 +129,6 @@ export default function PostSearchResults({
                 View post
                 <ArrowUpRight className="w-4 h-4" />
               </span>
-            </div>
-            <div className="mt-1 text-xs text-slate-400 opacity-80 group-hover:opacity-100 select-text">
-              <span className="font-mono">Post ID: {post.postId}</span>
             </div>
           </button>
         ))}

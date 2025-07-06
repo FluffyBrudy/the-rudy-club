@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { SearchUsersResponse } from "@/types/apiResponseTypes";
 
 interface UserSearchResultsProps {
+  onUserClick: (userId: string) => void;
   results: SearchUsersResponse[];
   loading: boolean;
   error: string | null;
@@ -17,6 +18,7 @@ export default function UserSearchResults({
   error,
   onClose,
   onLoadMore,
+  onUserClick,
   hasMore,
 }: UserSearchResultsProps) {
   return (
@@ -30,7 +32,10 @@ export default function UserSearchResults({
         {results.map((user) => (
           <button
             key={user.id}
-            onClick={onClose}
+            onClick={() => {
+              onUserClick(user.id);
+              onClose();
+            }}
             className="flex items-center w-full p-4 text-left rounded-xl transition-all duration-200 group"
             style={{ background: "transparent" }}
           >

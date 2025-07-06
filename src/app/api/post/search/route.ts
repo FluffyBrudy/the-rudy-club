@@ -6,8 +6,10 @@ export async function GET(request: NextRequest) {
     if (!token) throw new Error("no token provided");
 
     const param = request.nextUrl.searchParams.get("q")
-    console.log(param)
-    const response = await fetch(`${process.env.MAIN_API_URL}/post/search?q=${param}`, {
+    if (!param) {
+      return NextResponse.json({ error: "improper query" }, { status: 400 })
+    }
+    const response = await fetch(`${process.env.MAIN_API_URL}/post/search?q=${encodeURIComponent(param)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

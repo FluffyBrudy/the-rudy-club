@@ -13,12 +13,11 @@ interface SearchModalProps {
 }
 
 import FilterTabs from "./FilterTabs";
-import RecentAndTrending from "./RecentAndTrending";
 import UserSearchResults from "./UserSearchResults";
 import PostSearchResults from "./PostSearchResults";
-import { FEEDS_ROUTE } from "@/lib/navigation/router";
+import { FEEDS_ROUTE, USER_PROFILE } from "@/lib/navigation/router";
 
-const DEBOUNCE_INTERVAL = 350; // ms
+const DEBOUNCE_INTERVAL = 350;
 const MIN_QUERY_LENGTH = 3;
 
 export default function SearchModal({
@@ -40,7 +39,6 @@ export default function SearchModal({
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -56,7 +54,6 @@ export default function SearchModal({
     }
   }, [isOpen]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -77,9 +74,7 @@ export default function SearchModal({
     };
   }, [isOpen, onClose]);
 
-  // Debounced search effect
   useEffect(() => {
-    // Always hide results if query is empty
     if (!query || query.length < MIN_QUERY_LENGTH) {
       setShowResults(query.length > 0);
       setUserResults([]);
@@ -178,13 +173,13 @@ export default function SearchModal({
     setShowResults(value.length > 0);
   };
 
-  const handleSearch = (searchTerm: string) => {
-    setQuery(searchTerm);
-    setShowResults(true);
-  };
-
   const handlePostClick = (postId: string) => {
     router.push(`${FEEDS_ROUTE}/post/${postId}`);
+    onClose();
+  };
+
+  const handleUserClick = (userId: string) => {
+    router.push(`${USER_PROFILE}/${userId}`);
     onClose();
   };
 
@@ -272,18 +267,54 @@ export default function SearchModal({
             className="max-h-96 overflow-y-auto"
             style={{ background: "var(--card-bg, #1e293b)" }}
           >
-            {!showResults ||
-            (activeFilter !== "Users" && query.length < MIN_QUERY_LENGTH) ? (
-              <RecentAndTrending onSearch={handleSearch} />
+            {query.length > 0 && query.length < MIN_QUERY_LENGTH ? (
+              <div className="p-6 flex flex-col items-center justify-center py-12">
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                  style={{ background: "var(--input-bg, #334155)" }}
+                >
+                  <Search
+                    className="h-8 w-8"
+                    style={{ color: "var(--muted-color, #94a3b8)" }}
+                  />
+                </div>
+                <p
+                  className="text-center"
+                  style={{ color: "var(--muted-color, #94a3b8)" }}
+                >
+                  Please enter at least {MIN_QUERY_LENGTH} characters to search.
+                </p>
+              </div>
             ) : activeFilter === "Users" ? (
-              <UserSearchResults
-                results={userResults}
-                loading={loading}
-                error={error}
-                onClose={onClose}
-                onLoadMore={handleLoadMore}
-                hasMore={hasMore}
-              />
+              showResults ? (
+                <UserSearchResults
+                  onUserClick={handleUserClick}
+                  results={userResults}
+                  loading={loading}
+                  error={error}
+                  onClose={onClose}
+                  onLoadMore={handleLoadMore}
+                  hasMore={hasMore}
+                />
+              ) : (
+                <div className="p-6 flex flex-col items-center justify-center py-12">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                    style={{ background: "var(--input-bg, #334155)" }}
+                  >
+                    <Search
+                      className="h-8 w-8"
+                      style={{ color: "var(--muted-color, #94a3b8)" }}
+                    />
+                  </div>
+                  <p
+                    className="text-center"
+                    style={{ color: "var(--muted-color, #94a3b8)" }}
+                  >
+                    Start typing to search for users.
+                  </p>
+                </div>
+              )
             ) : activeFilter === "Posts" ? (
               <PostSearchResults
                 results={postResults}

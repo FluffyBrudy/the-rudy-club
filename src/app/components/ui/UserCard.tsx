@@ -22,6 +22,8 @@ export default function UserCard({
   onAddFriendClick,
   showActions = true,
 }: UserCardProps) {
+  const profileTooltip = "Click to view profile";
+
   return (
     <div
       className="p-4 rounded-xl border transition-all duration-200 hover:shadow-md"
@@ -31,14 +33,34 @@ export default function UserCard({
       }}
     >
       <div className="flex items-center justify-between">
-        <User
-          id={id}
-          username={username}
-          picture={picture}
-          size="md"
-          onClick={onUserClick}
-          className="flex-1"
-        />
+        <div
+          className={`flex-1 rounded-lg transition-colors duration-200 ${
+            onUserClick ? "hover:bg-[var(--accent-color)] cursor-pointer" : ""
+          }`}
+          onClick={onUserClick ? () => onUserClick(id) : undefined}
+          title={onUserClick ? profileTooltip : undefined}
+          tabIndex={onUserClick ? 0 : undefined}
+          role={onUserClick ? "button" : undefined}
+          onKeyDown={
+            onUserClick
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onUserClick(id);
+                  }
+                }
+              : undefined
+          }
+          aria-label={onUserClick ? profileTooltip : undefined}
+        >
+          <User
+            id={id}
+            username={username}
+            picture={picture}
+            size="md"
+            className="w-full"
+          />
+        </div>
 
         {showActions && (
           <div className="flex items-center gap-2 ml-4">
