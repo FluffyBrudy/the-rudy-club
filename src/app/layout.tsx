@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import Navbar from "./components/NavComponents/Navbar";
 import { AuthRouterGuard } from "./components/RouterProtector/RouterGuard";
+import JWTRefreshScheduler from "./components/silentRefresh/SilentRefresh";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <JWTRefreshScheduler />
         <ThemeProvider
           attribute="data-theme"
           defaultTheme="light"

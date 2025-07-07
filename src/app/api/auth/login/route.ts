@@ -21,22 +21,21 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
+    const setCookie = response.headers.get('Set-Cookie');
 
-    const responseObj = NextResponse.json(data, { status: response.status });
-
-    if (response.ok && data.data?.accessToken) {
-      responseObj.cookies.set({
-        name: "accessToken",
-        value: data.data.accessToken,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
+    // Forward the Set-Cookie header as-is if present
+    if (setCookie) {
+      return new NextResponse(JSON.stringify(data), {
+        status: response.status,
+        headers: {
+          "Set-Cookie": setCookie,
+          "Content-Type": "application/json"
+        }
       });
     }
 
-    return responseObj;
+    // Fallback if no Set-Cookie header
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Login proxy error:", error);
     return NextResponse.json(
