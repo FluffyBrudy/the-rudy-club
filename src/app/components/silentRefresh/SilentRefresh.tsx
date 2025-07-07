@@ -49,9 +49,8 @@ const JWTRefreshScheduler: React.FC = () => {
       const res = await apiClient.auth.issueNewToken();
       scheduleRefresh();
       if (res.error) {
-        setTimeout(() => {
-          if (!pathname.includes(LOGIN_ROUTE)) router.push(LOGIN_ROUTE);
-        }, 100);
+        console.error("token refresh failed");
+        localStorage.removeItem("accessToken");
       }
     } catch (e) {
       console.error("Token refresh failed:", e);
