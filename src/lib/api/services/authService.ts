@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import { AxiosInstance } from "axios";
 import { TAPIResponse, ErrorResponse } from "@/lib/api/apiTypes";
 import { API_ENDPOINTS } from "../config";
 import type { LoginResponse, RegisterResponse } from "@/types/apiResponseTypes";
@@ -8,7 +8,7 @@ export class AuthService {
 
   async issueNewToken() {
     try {
-      const response = await axios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {}, { withCredentials: true })
+      const response = await this.axiosInstance.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {}, { withCredentials: true })
       if ([200, 201].includes(response.status)) {
         const data = response.data as { data: LoginResponse };
         localStorage.setItem("accessToken", data.data.accessToken)
