@@ -2,14 +2,10 @@
 import React, { useEffect, useRef } from "react";
 import { decodeJWT } from "@/utils/decodeJWT";
 import apiClient from "@/lib/api/apiclient";
-import { usePathname, useRouter } from "next/navigation";
-import { LOGIN_ROUTE } from "@/lib/navigation/router";
 
 const REFRESH_DELAY_SECONDS = 13 * 60;
 
 const JWTRefreshScheduler: React.FC = () => {
-  const router = useRouter();
-  const pathname = usePathname();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearTimer = () => {
