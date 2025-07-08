@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Image from "next/image";
 import apiClient from "@/lib/api/apiclient";
+import FollowButton from "./FollowUserButton";
 
 interface SuggestedFriendsResponse {
   suggestedUser: string;
@@ -18,7 +19,6 @@ export default function FriendsSuggestion() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const [isRequestSent, setIsRequestSent] = useState<boolean | null>(null);
 
   const fetchSuggestions = async (pageNum = 0) => {
     try {
@@ -45,13 +45,6 @@ export default function FriendsSuggestion() {
   useEffect(() => {
     fetchSuggestions();
   }, []);
-
-  const handleFollow = async (userId: string) => {
-    const res = await apiClient.social.sendFriendRequest(userId);
-    if (res.data) {
-      setIsRequestSent(true);
-    }
-  };
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -166,25 +159,7 @@ export default function FriendsSuggestion() {
                   <p className="text-sm font-medium">@{user.username}</p>
                 </div>
               </div>
-              <button
-                disabled={!!isRequestSent}
-                onClick={() => handleFollow(user.suggestedUser)}
-                className="text-xs px-3 py-1 rounded-full font-medium transition-colors duration-200 hover:opacity-90"
-                style={{
-                  backgroundColor: "var(--primary-color)",
-                  color: "white",
-                }}
-              >
-                {isRequestSent === false ? (
-                  <span>
-                    <Loader2 className="animate-spin" />
-                  </span>
-                ) : isRequestSent === true ? (
-                  "pending"
-                ) : (
-                  "Follow"
-                )}
-              </button>
+              <FollowButton userId={user.suggestedUser} />
             </div>
           ))}
         </div>

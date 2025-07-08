@@ -112,3 +112,13 @@ export type SearchPostsResponse = {
   matchedContent: string;
   fullContent?: string //forgot to add in backend
 }
+
+export type FetchLoggedUserProfileResponse = {
+  userId: string;
+  picture: string;
+  initialized: boolean;
+  username: string;
+  bio: string;
+}
+
+export type UpdateLoggedUserProfileBioResponse = FetchLoggedUserProfileResponse;

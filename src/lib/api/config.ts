@@ -53,5 +53,7 @@ export const getPigeonEndpoints = (baseUrl: string) => ({
   PREFERENCES: {
     PROFILE_SIGNATURE: `${baseUrl}/api/preference/profile/signature`,
     PROFILE_IMAGE: `${baseUrl}/api/preference/profile/image`,
+    PROFILE_FETCH: `${baseUrl}/api/preference/profile`,
+    PROFILE_BIO_UPDATE: `${baseUrl}/api/preference/profile/bio/update`
   },
 });

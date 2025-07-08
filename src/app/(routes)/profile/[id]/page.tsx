@@ -14,38 +14,64 @@ import {
 } from "@/app/components/ui/TabComponents";
 import Image from "next/image";
 import MediaLightbox from "@/app/components/ui/MediaLightbox";
+import { useAppStore } from "@/app/store/appStore";
+import FollowButton from "@/app/components/SharableComponents/FollowUserButton";
 
-function ProfileInfo({
-  user,
-}: {
-  user: {
+interface FallbackUserProps {
+  fallbackUser: {
     username: string;
     profilePicture: string;
     description: string;
-  } | null;
-}) {
+    userId: string;
+  };
+}
+
+function ProfileInfo({ fallbackUser }: FallbackUserProps) {
+  const [user, setUser] =
+    useState<FallbackUserProps["fallbackUser"]>(fallbackUser);
+  const loggedUserId = useAppStore((state) => state.user?.userId);
+
+  useEffect(() => {
+    apiClient.preference.fetchLoggedUserProfile(user.userId).then((res) => {
+      const { username, picture, bio, userId } = res.data!;
+      setUser({ username, profilePicture: picture, description: bio, userId });
+    });
+  }, [user.userId]);
+
   return (
-    <div className="rounded-xl shadow p-6 mb-6 flex items-center gap-4 bg-[var(--card-bg)] border border-[var(--border-color)]">
-      <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--muted-color)] flex items-center justify-center">
-        {user?.profilePicture ? (
-          <Image
-            src={user.profilePicture}
-            alt="Profile"
-            width={48}
-            height={48}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-3xl text-[var(--muted-color)]">
-            ?
-          </div>
-        )}
-      </div>
-      <div>
-        <div className="text-2xl font-bold text-[var(--text-color)]">
-          {user?.username || "User"}
+    <div className="rounded-xl shadow p-4 md:p-6 mb-6 flex flex-wrap md:flex-nowrap gap-6 bg-[var(--card-bg)] border border-[var(--border-color)]">
+      <div className="flex flex-1 basis-full md:basis-1/2 items-center gap-4">
+        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-[var(--muted-color)] flex items-center justify-center flex-shrink-0">
+          {user?.profilePicture ? (
+            <Image
+              src={user.profilePicture}
+              alt="Profile"
+              width={80}
+              height={80}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl text-[var(--muted-color)]">
+              ?
+            </div>
+          )}
         </div>
-        <div className="text-[var(--muted-color)]">{user?.description}</div>
+
+        <div className="min-w-0">
+          <h1 className="text-xl md:text-2xl font-bold text-[var(--text-color)] truncate">
+            {user?.username || "User"}
+          </h1>
+          <p className="text-[var(--muted-color)] mt-1 line-clamp-2 text-sm md:text-base">
+            {user?.description || "no description yet"}
+          </p>
+        </div>
       </div>
+
+      {user.userId !== loggedUserId && (
+        <div className="flex flex-1 basis-full md:basis-1/2 items-center">
+          <FollowButton userId={user.userId} />
+        </div>
+      )}
     </div>
   );
 }
@@ -135,6 +161,7 @@ export default function ProfilePage() {
         username: posts[0].username,
         profilePicture: posts[0].profilePicture,
         description: "No description yet.",
+        userId: posts[0].authorId,
       }
     : null;
 
@@ -171,7 +198,7 @@ export default function ProfilePage() {
 
   return (
     <div className="w-[min(1200px,95vw)] mx-auto mt-8">
-      <ProfileInfo user={user} />
+      <ProfileInfo fallbackUser={user!} />
 
       <div className="hidden lg:grid grid-cols-[320px_1fr] gap-8">
         <div className="flex flex-col gap-4">

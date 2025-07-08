@@ -12,6 +12,7 @@ import { CommentService } from "./services/commentService";
 import { ReactionService } from "./services/reactionService";
 import { SocialService } from "./services/socialService";
 import { SearchService } from "./services/searchService";
+import { PreferenceService } from "./services/preferenceService";
 
 export class ApiClient {
   private axiosInstance: AxiosInstance;
@@ -25,6 +26,7 @@ export class ApiClient {
   public reactions: ReactionService;
   public social: SocialService;
   public search: SearchService;
+  public preference: PreferenceService;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -46,6 +48,7 @@ export class ApiClient {
     this.reactions = new ReactionService(this.axiosInstance);
     this.social = new SocialService(this.pigeonEndpoints);
     this.search = new SearchService(this.pigeonEndpoints, this.axiosInstance)
+    this.preference = new PreferenceService(this.pigeonEndpoints)
   }
 
   get instance(): AxiosInstance {
