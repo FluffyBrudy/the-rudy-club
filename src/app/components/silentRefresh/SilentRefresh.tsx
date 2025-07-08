@@ -17,10 +17,16 @@ const JWTRefreshScheduler: React.FC = () => {
 
   const scheduleRefresh = () => {
     const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) return;
+    if (!accessToken) {
+      refreshToken();
+      return;
+    }
 
     const decoded = decodeJWT(accessToken);
-    if (!decoded || !decoded.payload) return;
+    if (!decoded || !decoded.payload) {
+      refreshToken();
+      return;
+    }
 
     const { iat, exp } = decoded.payload;
     if (typeof iat !== "number" || typeof exp !== "number") return;
