@@ -2,10 +2,12 @@
 import React, { useEffect, useRef } from "react";
 import { decodeJWT } from "@/utils/decodeJWT";
 import apiClient from "@/lib/api/apiclient";
+import { useAppStore } from "@/app/store/appStore";
 
 const REFRESH_DELAY_SECONDS = 13 * 60;
 
 const JWTRefreshScheduler: React.FC = () => {
+  const loginUser = useAppStore((state) => state.login);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearTimer = () => {
@@ -50,9 +52,12 @@ const JWTRefreshScheduler: React.FC = () => {
     try {
       const res = await apiClient.auth.issueNewToken();
       scheduleRefresh();
-      if (res.error) {
+      if (!res.data) {
         console.error("token refresh failed");
         localStorage.removeItem("accessToken");
+      } else {
+        console.log("logged");
+        loginUser(res.data);
       }
     } catch (e) {
       console.error("Token refresh failed:", e);

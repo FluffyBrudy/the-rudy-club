@@ -10,7 +10,22 @@ export function decodeJWT(token: string) {
         const decodedPayload = JSON.parse(atob(padToken(payload)))
         return { header: decodedHeader, payload: decodedPayload, signature };
     } catch (e) {
-        console.error(e)
+        console.error((e as Error).message)
         return null;
     }
+}
+
+export function isTokenExpired(token: string): boolean {
+    const decodedToken = decodeJWT(token);
+    if (!decodedToken) {
+        return true;
+    }
+
+    const { payload } = decodedToken;
+    if (!payload.exp) {
+        return false;
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp < currentTime;
 }

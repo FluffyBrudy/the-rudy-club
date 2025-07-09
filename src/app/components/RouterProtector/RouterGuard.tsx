@@ -11,6 +11,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import apiClient from "@/lib/api/apiclient";
+import { isTokenExpired } from "@/utils/decodeJWT";
 
 interface AuthRouteGuardProps {
   children: ReactNode;
@@ -79,7 +80,11 @@ export function AuthRouterGuard({
       }
     };
 
-    attemptAutoLogin();
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      const isExpired = isTokenExpired(token);
+      if (!isExpired) attemptAutoLogin();
+    }
   }, [
     isAuthenticated,
     authState.hasAttempted,
