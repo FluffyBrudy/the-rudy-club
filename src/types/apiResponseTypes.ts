@@ -122,3 +122,4 @@ export type FetchLoggedUserProfileResponse = {
 }
 
 export type UpdateLoggedUserProfileBioResponse = FetchLoggedUserProfileResponse;
+export type CheckFriendshipStatusResponse = { isFriend: boolean }

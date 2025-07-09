@@ -1,13 +1,14 @@
 import { TAPIResponse } from "../apiTypes";
 import { getPigeonEndpoints } from "../config";
 import {
+  CheckFriendshipStatusResponse,
   ConnectedFriendsResponse,
   PendingFriendRequests,
   SuggestedFriendsResponse,
 } from "@/types/apiResponseTypes";
 
 export class SocialService {
-  constructor(private pigeonEndpoints: ReturnType<typeof getPigeonEndpoints>) {}
+  constructor(private pigeonEndpoints: ReturnType<typeof getPigeonEndpoints>) { }
 
   async getConnectedFriends(): Promise<
     TAPIResponse<ConnectedFriendsResponse[]>
@@ -173,6 +174,34 @@ export class SocialService {
     } catch (error) {
       console.error("Failed to fetch connected friends:", error);
       return { error: "failed to fetch friends", data: null };
+    }
+  }
+  public async checkFriendshipStatus<T = CheckFriendshipStatusResponse>(
+    userId: string
+  ): Promise<TAPIResponse<T>> {
+    try {
+      const response = await fetch(
+        `${this.pigeonEndpoints.SOCIAL.FRIENDSHIP_CHECK}?q=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if ([200, 201].includes(response.status)) {
+        const data = (await response.json()) as {
+          data: T;
+        };
+        return { error: null, data: data.data };
+      }
+
+      return { error: "failed to check friendship status", data: null };
+    } catch (error) {
+      console.error("Failed to check friendship status:", error);
+      return { error: "failed to check friendship status", data: null };
     }
   }
 }

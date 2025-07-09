@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import apiClient from "@/lib/api/apiclient";
 import PostCard from "@/app/components/PostComponents/PostCard";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import FriendsSuggestion from "@/app/components/SharableComponents/FriendsSuggestion";
 import { PostResponse } from "@/types/apiResponseTypes";
 import {
@@ -30,13 +30,38 @@ function ProfileInfo({ fallbackUser }: FallbackUserProps) {
   const [user, setUser] =
     useState<FallbackUserProps["fallbackUser"]>(fallbackUser);
   const loggedUserId = useAppStore((state) => state.user?.userId);
+  const [isAlreadyFriend, setIsAlreadyFriend] = useState<null | boolean>(null);
 
   useEffect(() => {
+    /**
+     * hook has disable eslint because userId never change, at least shouldnt change if code is correct
+     * so i supressed it given safe condition it was no harm to pass value in dep array but for now
+     * let it be , let it be because somehow if it get wrong, it means somehwere coed is already fucked up
+     * but thats hardly possible for mismatch, but still cutious cuz useEffect has been nightmare for indifinate refresh
+     * in previous project. dattebayo
+     */
     apiClient.preference.fetchLoggedUserProfile(user.userId).then((res) => {
       const { username, picture, bio, userId } = res.data!;
       setUser({ username, profilePicture: picture, description: bio, userId });
     });
-  }, [user.userId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    /**
+     * same reason as above for userId
+     */
+    if (user.userId === loggedUserId) return;
+    apiClient.social.checkFriendshipStatus(user.userId).then((res) => {
+      console.log(res.data);
+      if (res.data) {
+        setIsAlreadyFriend(res.data.isFriend);
+      } else {
+        setIsAlreadyFriend(null);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedUserId]);
 
   return (
     <div className="rounded-xl shadow p-4 md:p-6 mb-6 flex flex-wrap md:flex-nowrap gap-6 bg-[var(--card-bg)] border border-[var(--border-color)]">
@@ -69,7 +94,18 @@ function ProfileInfo({ fallbackUser }: FallbackUserProps) {
 
       {user.userId !== loggedUserId && (
         <div className="flex flex-1 basis-full md:basis-1/2 items-center">
-          <FollowButton userId={user.userId} />
+          {isAlreadyFriend === null ? (
+            <div className="flex items-center justify-center w-full">
+              <div className="w-24 h-8 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+          ) : isAlreadyFriend ? (
+            <div className="flex items-center">
+              <Check className="text-green-500" />
+              <span className="ml-2">Already Following</span>
+            </div>
+          ) : (
+            <FollowButton userId={user.userId} />
+          )}
         </div>
       )}
     </div>
