@@ -247,6 +247,7 @@ export default function SearchModal({
                 style={{ color: "var(--muted-color, #94a3b8)" }}
               />
               <input
+                disabled={activeFilter === "Polls"}
                 ref={inputRef}
                 type="text"
                 value={query}

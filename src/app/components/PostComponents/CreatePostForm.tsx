@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useRef } from "react";
-import { ImageIcon, Smile, MapPin, X, Loader2 } from "lucide-react";
+import { ImageIcon, X, Loader2 } from "lucide-react";
 import { useAppStore } from "@/app/store/appStore";
 import Image from "next/image";
 import apiClient from "@/lib/api/apiclient";
@@ -163,20 +163,6 @@ export default function CreatePostForm() {
                   multiple
                   className="hidden"
                 />
-
-                <button
-                  type="button"
-                  className="p-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
-                >
-                  <Smile size={20} style={{ color: "var(--primary-color)" }} />
-                </button>
-
-                <button
-                  type="button"
-                  className="p-2 rounded-full hover:bg-accent/50 transition-colors duration-200"
-                >
-                  <MapPin size={20} style={{ color: "var(--primary-color)" }} />
-                </button>
               </div>
 
               <button
