@@ -55,6 +55,7 @@ function ProfileInfo({ fallbackUser }: FallbackUserProps) {
     apiClient.social.checkFriendshipStatus(user.userId).then((res) => {
       console.log(res.data);
       if (res.data) {
+        console.log(res.data);
         setIsAlreadyFriend(res.data.isFriend);
       } else {
         setIsAlreadyFriend(null);

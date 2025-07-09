@@ -172,10 +172,11 @@ export class SocialService {
 
       return { error: "failed to fetch friends", data: null };
     } catch (error) {
-      console.error("Failed to fetch connected friends:", error);
+      console.error("Fail ed to fetch connected friends:", error);
       return { error: "failed to fetch friends", data: null };
     }
   }
+
   public async checkFriendshipStatus<T = CheckFriendshipStatusResponse>(
     userId: string
   ): Promise<TAPIResponse<T>> {

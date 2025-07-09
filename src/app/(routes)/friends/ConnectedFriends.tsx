@@ -10,6 +10,7 @@ import {
   UserPlus,
   MessageCircle,
   Sparkles,
+  RefreshCcw,
 } from "lucide-react";
 import User from "@/app/components/ui/User";
 import UserCard from "@/app/components/ui/UserCard";
@@ -26,20 +27,24 @@ export default function ConnectedFriends() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [sortBy, setSortBy] = useState<"name" | "recent">("name");
   const [showFilters, setShowFilters] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchFriends = async () => {
+    setRefreshing(true);
+    try {
+      const connectedFriends = await apiClient.social.getConnectedFriends();
+      if (connectedFriends.data) {
+        setFriends(connectedFriends.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch friends:", error);
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const connectedFriends = await apiClient.social.getConnectedFriends();
-        if (connectedFriends.data) {
-          setFriends(connectedFriends.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch friends:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchFriends();
   }, []);
 
@@ -71,7 +76,7 @@ export default function ConnectedFriends() {
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-color)]/5 to-emerald-500/5 rounded-3xl -z-10"></div>
-        <div className="p-6">
+        <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3 mb-3">
             <div className="relative">
               <div className="h-10 w-10 bg-gradient-to-br from-[var(--primary-color)] to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -92,6 +97,24 @@ export default function ConnectedFriends() {
               </p>
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              if (!refreshing) fetchFriends();
+            }}
+            disabled={refreshing}
+            aria-label="Refresh connected friends"
+            title="Refresh connected friends"
+            className={`p-3 rounded-xl flex items-center justify-center text-[var(--text-color)] transition-all duration-300 hover:bg-[var(--accent-color)] hover:text-[var(--primary-color)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] ${
+              refreshing ? "opacity-60 cursor-not-allowed" : ""
+            }`}
+          >
+            <RefreshCcw
+              className={`h-5 w-5 transform transition-transform duration-700 ${
+                refreshing ? "animate-spin" : ""
+              }`}
+            />
+          </button>
         </div>
       </div>
 
