@@ -10,7 +10,7 @@ export type AuthSlice = {
   isAuthenticated: boolean;
   user: User | null;
   login: (data: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 export type PostSlice = {

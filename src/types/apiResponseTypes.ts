@@ -13,6 +13,10 @@ export type LoginResponse = {
   profilePicture: string;
 };
 
+export type LogoutResponse = {
+  message: string
+}
+
 export type PostResponse = {
   authorId: string;
   postId: number;

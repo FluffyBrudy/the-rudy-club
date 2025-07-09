@@ -58,6 +58,9 @@ const JWTRefreshScheduler: React.FC = () => {
     try {
       const res = await apiClient.auth.issueNewToken();
 
+      if (res.data === "NO_CONTENT") {
+        return;
+      }
       if (res.error || !res.data) {
         console.error("Token refresh failed:", res.error ?? "No data");
 

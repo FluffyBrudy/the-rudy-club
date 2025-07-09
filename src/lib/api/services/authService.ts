@@ -1,20 +1,32 @@
 import { AxiosInstance } from "axios";
 import { TAPIResponse, ErrorResponse } from "@/lib/api/apiTypes";
 import { API_ENDPOINTS } from "../config";
-import type { LoginResponse, RegisterResponse } from "@/types/apiResponseTypes";
+import type {
+  LoginResponse,
+  LogoutResponse,
+  RegisterResponse,
+} from "@/types/apiResponseTypes";
 
 export class AuthService {
   constructor(private axiosInstance: AxiosInstance) { }
 
-  async issueNewToken<T extends LoginResponse = LoginResponse>(): Promise<TAPIResponse<T>> {
+  async issueNewToken<T extends LoginResponse = LoginResponse>(): Promise<
+    TAPIResponse<T | "NO_CONTENT">
+  > {
     try {
-      const response = await this.axiosInstance.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {}, { withCredentials: true })
+      const response = await this.axiosInstance.post(
+        API_ENDPOINTS.AUTH.REFRESH_TOKEN,
+        {},
+        { withCredentials: true }
+      );
       if ([200, 201].includes(response.status)) {
-        const data = response.data as { data: T }
-        localStorage.setItem("accessToken", data.data.accessToken)
+        const data = response.data as { data: T };
+        localStorage.setItem("accessToken", data.data.accessToken);
         return { error: null, data: data.data };
       }
-
+      if (response.status === 204) {
+        return { error: null, data: "NO_CONTENT" };
+      }
       return { error: "failed to login", data: null };
     } catch (error) {
       console.error("Login API error:", error);
@@ -29,12 +41,16 @@ export class AuthService {
     password: string
   ): Promise<TAPIResponse<LoginResponse>> {
     try {
-      const response = await this.axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, {
-        email,
-        password,
-      }, {
-        withCredentials: true
-      });
+      const response = await this.axiosInstance.post(
+        API_ENDPOINTS.AUTH.LOGIN,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if ([200, 201].includes(response.status)) {
         const data = response.data as { data: LoginResponse };
@@ -50,7 +66,9 @@ export class AuthService {
     }
   }
 
-  async autoLogin<T = LoginResponse>(): Promise<TAPIResponse<Omit<T, "accessToken">>> {
+  async autoLogin<T = LoginResponse>(): Promise<
+    TAPIResponse<Omit<T, "accessToken">>
+  > {
     try {
       const response = await this.axiosInstance.get(
         API_ENDPOINTS.AUTH.AUTHORIZE
@@ -95,6 +113,30 @@ export class AuthService {
     } catch (error) {
       const e = error as ErrorResponse;
       const errMsg = e.data?.error || e.statusText || "failed to register";
+      return { error: `${e.status}:${errMsg}`, data: null };
+    }
+  }
+
+  async logout(): Promise<TAPIResponse<LogoutResponse>> {
+    try {
+      const response = await this.axiosInstance.post(
+        API_ENDPOINTS.AUTH.LOGOUT,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      if ([200, 201].includes(response.status)) {
+        const data = response.data as { data: LogoutResponse };
+        return { error: null, data: data.data };
+      }
+
+      return { error: "failed to login", data: null };
+    } catch (error) {
+      console.error("Login API error:", error);
+      const e = error as ErrorResponse;
+      const errMsg = e.data?.error || e.statusText || "failed to login";
       return { error: `${e.status}:${errMsg}`, data: null };
     }
   }

@@ -41,8 +41,9 @@ export default function Navbar() {
     }
   };
   const handleLogout = () => {
-    logout();
-    router.push("/");
+    logout().then(() => {
+      router.push("/");
+    });
   };
 
   const actions: NavActionHandler = {

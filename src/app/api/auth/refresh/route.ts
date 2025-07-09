@@ -12,15 +12,18 @@ export async function POST(request: NextRequest) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "cookie": (request.cookies) as unknown as string,
+                cookie: request.cookies as unknown as string,
             },
             body: JSON.stringify({}),
         });
 
-        const data = await response.json();
-
-        const responseObj = NextResponse.json(data, { status: response.status });
-        return responseObj;
+        if (response.status === 204) {
+            return new NextResponse(null, { status: 204 })
+        } else {
+            const data = response.json();
+            const responseObj = NextResponse.json(data, { status: response.status });
+            return responseObj;
+        }
     } catch (error) {
         console.error("token refresh proxy error:", error);
         return NextResponse.json(
