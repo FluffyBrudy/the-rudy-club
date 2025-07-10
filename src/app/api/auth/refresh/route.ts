@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
         if (response.status === 204) {
             return new NextResponse(null, { status: 204 })
         } else {
-            const data = response.json();
+            const data = await response.json();
+
             const responseObj = NextResponse.json(data, { status: response.status });
             return responseObj;
         }

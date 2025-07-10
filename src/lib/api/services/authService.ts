@@ -21,6 +21,7 @@ export class AuthService {
       );
       if ([200, 201].includes(response.status)) {
         const data = response.data as { data: T };
+        console.log(response.data)
         localStorage.setItem("accessToken", data.data.accessToken);
         return { error: null, data: data.data };
       }
