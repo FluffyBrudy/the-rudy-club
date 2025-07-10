@@ -65,7 +65,15 @@ export default function ConnectedFriends() {
   };
 
   const handleMessageClick = (userId: string) => {
-    console.log("Message user:", userId);
+    if (typeof window === "undefined") return "";
+
+    const currentUrl = window.location.hostname;
+    console.log(currentUrl);
+    const baseUrl = "https://pigeon-messanger-frontend.vercel.app/";
+    const url = `${baseUrl}?userId=${encodeURIComponent(
+      userId
+    )}&from=${encodeURIComponent(currentUrl)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   if (loading) {
