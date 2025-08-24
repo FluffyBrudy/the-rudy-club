@@ -27,6 +27,7 @@ export default function FriendsSuggestion() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
+        console.log(response.data);
         if (pageNum === 0) {
           setSuggestions(response.data);
         } else {
