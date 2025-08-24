@@ -131,11 +131,11 @@ export default function PostCard({ post, handleProfileClick }: PostCardProps) {
                   <MessageCircle size={18} />
                 </button>
 
-                <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                <button className="hidden items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
                   <Repeat2 size={18} />
                 </button>
 
-                <button className="flex items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
+                <button className="hidden items-center gap-1 p-2 rounded-full hover:bg-accent/50 transition-colors duration-200">
                   <Share2 size={18} />
                 </button>
               </div>
